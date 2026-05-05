@@ -1,0 +1,335 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+:root {
+  color-scheme: light;
+  --background: 0 0% 100%;
+  --canvas: 0 0% 98%;
+  --surface: 0 0% 96%;
+  --border: 240 6% 90%;
+  --border-hover: 240 6% 82%;
+  --foreground: 240 5% 4%;
+  --muted: 240 4% 46%;
+  --secondary: 142 71% 45%;
+  --primary: 142 71% 45%;
+  --primary-foreground: 0 0% 100%;
+  --accent: 142 71% 45%;
+  --accent-foreground: 0 0% 100%;
+}
+
+.dark {
+  color-scheme: dark;
+  --background: 0 0% 6%;
+  --canvas: 0 0% 8%;
+  --surface: 0 0% 12%;
+  --border: 0 0% 18%;
+  --border-hover: 0 0% 28%;
+  --foreground: 0 0% 98%;
+  --muted: 0 0% 65%;
+  --secondary: 142 71% 45%;
+  --primary: 142 71% 45%;
+  --primary-foreground: 0 0% 100%;
+  --accent: 142 71% 45%;
+  --accent-foreground: 0 0% 100%;
+}
+
+body {
+  font-family: 'Inter', system-ui, sans-serif;
+  background-color: hsl(var(--background));
+  color: hsl(var(--foreground));
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.app-shell {
+  background-color: hsl(var(--background));
+  background-image:
+    radial-gradient(600px 320px at 50% 0%, hsl(var(--secondary) / 0.16), transparent 60%),
+    radial-gradient(520px 320px at 10% 20%, hsl(265 80% 55% / 0.08), transparent 60%);
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+}
+
+/* Custom scrollbar - minimal */
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: hsl(var(--border-hover));
+  border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: hsl(var(--border));
+}
+
+/* Selection - green accent */
+::selection {
+  background: hsl(var(--secondary) / 0.35);
+  color: hsl(var(--foreground));
+}
+
+/* Terminal animations */
+.connector-beam {
+  fill: none;
+  stroke: hsl(var(--secondary));
+  stroke-width: 2.5;
+  stroke-dasharray: 12 100;
+  stroke-linecap: round;
+  animation: beamFlow 2s ease-in-out infinite;
+  filter: drop-shadow(0 0 6px rgba(34, 197, 94, 0.7));
+}
+
+@keyframes beamFlow {
+  from {
+    stroke-dashoffset: 112;
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+.connector-path {
+  fill: none;
+  stroke: hsl(var(--border));
+  stroke-width: 1.5;
+}
+
+/* Traveling particle along beam */
+.beam-particle {
+  fill: hsl(var(--secondary));
+  filter: drop-shadow(0 0 8px rgba(34, 197, 94, 0.9));
+}
+
+/* Float animation */
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-8px);
+  }
+}
+
+.animate-float {
+  animation: float 6s ease-in-out infinite;
+}
+
+.animate-float-delayed {
+  animation: float 6s ease-in-out 3s infinite;
+}
+
+/* Terminal line animation */
+.terminal-line {
+  opacity: 0;
+  transform: translateY(4px);
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.terminal-line.show {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Blinking cursor - green */
+.cursor {
+  display: inline-block;
+  width: 2px;
+  height: 16px;
+  background: hsl(var(--secondary));
+  margin-left: 2px;
+  animation: cursorBlink 1s steps(2, start) infinite;
+  vertical-align: middle;
+}
+
+@keyframes cursorBlink {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0;
+  }
+}
+
+/* Vanish out animation for terminal reset */
+@keyframes vanishOut {
+  0% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+}
+
+/* Graph fade gradient overlay */
+.graph-fade {
+  -webkit-mask-image: linear-gradient(to bottom, black 70%, transparent 100%);
+  mask-image: linear-gradient(to bottom, black 70%, transparent 100%);
+}
+
+/* Terminal scrollbar */
+.terminal-scroll::-webkit-scrollbar {
+  width: 4px;
+}
+
+.terminal-scroll::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.terminal-scroll::-webkit-scrollbar-thumb {
+  background: hsl(var(--border));
+  border-radius: 2px;
+}
+
+.terminal-scroll::-webkit-scrollbar-thumb:hover {
+  background: hsl(var(--border-hover));
+}
+
+/* Glow effect for center node */
+.center-glow {
+  box-shadow: 0 0 40px rgba(34, 197, 94, 0.3), 0 0 80px rgba(34, 197, 94, 0.1);
+  animation: pulseGlow 3s ease-in-out infinite;
+}
+
+@keyframes pulseGlow {
+  0%, 100% {
+    box-shadow: 0 0 40px rgba(34, 197, 94, 0.3), 0 0 80px rgba(34, 197, 94, 0.1);
+  }
+  50% {
+    box-shadow: 0 0 60px rgba(34, 197, 94, 0.4), 0 0 100px rgba(34, 197, 94, 0.2);
+  }
+}
+
+/* Service icon hover glow */
+.service-icon {
+  transition: all 0.3s ease;
+}
+
+.service-icon:hover {
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  transform: translateY(-2px);
+}
+
+/* Service icon pulse animation - synced with beams */
+.service-icon-pulse {
+  animation: iconPulse 4s ease-in-out infinite;
+}
+
+.service-icon-pulse-delayed {
+  animation: iconPulse 4s ease-in-out 2s infinite;
+}
+
+@keyframes iconPulse {
+  0%, 100% {
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  }
+  25%, 75% {
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  }
+  50% {
+    box-shadow: 0 4px 24px rgba(34, 197, 94, 0.25);
+  }
+}
+
+/* Rotating ring around center node */
+.center-ring {
+  animation: rotateRing 12s linear infinite;
+}
+
+@keyframes rotateRing {
+  from {
+    transform: translate(-50%, -50%) rotate(0deg);
+  }
+  to {
+    transform: translate(-50%, -50%) rotate(360deg);
+  }
+}
+
+/* Orbiting dots around center */
+.orbit-dot {
+  animation: orbitDot 6s linear infinite;
+  transform-origin: center;
+}
+
+@keyframes orbitDot {
+  from {
+    transform: rotate(0deg) translateX(48px) rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg) translateX(48px) rotate(-360deg);
+  }
+}
+
+/* Enhanced beam with gradient effect */
+.connector-beam-enhanced {
+  fill: none;
+  stroke: url(#beamGradient);
+  stroke-width: 2.5;
+  stroke-dasharray: 15 120;
+  stroke-linecap: round;
+  animation: beamFlowEnhanced 2s ease-in-out infinite;
+  filter: drop-shadow(0 0 3px rgba(34, 197, 94, 0.5));
+}
+
+@keyframes beamFlowEnhanced {
+  from {
+    stroke-dashoffset: 135;
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+/* Shimmer effect for step cards */
+@keyframes shimmer {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+/* Pulse scale animation */
+@keyframes pulseScale {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+}
+
+.animate-pulse-scale {
+  animation: pulseScale 2s ease-in-out infinite;
+}
+
+/* Travel right animation for connector dots */
+@keyframes travelRight {
+  0% {
+    left: 0;
+    opacity: 1;
+  }
+  100% {
+    left: 100%;
+    opacity: 0;
+  }
+}
