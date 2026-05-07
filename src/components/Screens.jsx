@@ -112,59 +112,58 @@ export function Screens() {
           </div>
         </FadeIn>
 
-        {/* 2. Two-up: Quick Summary + Agent Card — side by side, smaller images */}
+        {/* 2. Quick Summary — left-right layout */}
         <FadeIn className="mb-20">
-          <div className="grid md:grid-cols-2 gap-8 max-w-5xl mx-auto">
-            {/* Quick Summary */}
-            <div className="flex flex-col">
-              <div className="mb-5">
-                <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-border bg-canvas mb-3">
-                  <BarChart3 className="w-4 h-4 text-secondary" />
-                  <span className="font-mono text-xs uppercase tracking-widest text-secondary">
-                    Quick Summary
-                  </span>
-                </div>
-                <h3 className="font-serif text-xl sm:text-2xl font-light text-foreground mb-2 leading-tight">
-                  Instant root cause analysis
-                </h3>
-                <p className="text-sm lg:text-base text-muted leading-relaxed">
-                  Get AI-generated summaries that pinpoint the root cause, affected components, and recommended fixes — no manual log diving required.
-                </p>
+          <div className="grid lg:grid-cols-2 gap-10 lg:gap-16 items-center max-w-5xl mx-auto">
+            <div>
+              <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-border bg-canvas mb-6">
+                <BarChart3 className="w-4 h-4 text-secondary" />
+                <span className="font-mono text-xs uppercase tracking-widest text-secondary">
+                  Quick Summary
+                </span>
               </div>
-              <div className="rounded-xl bg-canvas border border-border overflow-hidden shadow-lg">
-                <img
-                  src="/Quicksummary.png"
-                  alt="Quick Summary"
-                  className="w-full h-auto object-cover"
-                  loading="lazy"
-                />
-              </div>
+              <h3 className="font-serif text-2xl sm:text-3xl lg:text-4xl font-light text-foreground mb-4 leading-tight">
+                Instant root cause analysis
+              </h3>
+              <p className="text-base lg:text-lg text-muted leading-relaxed max-w-xl">
+                Get AI-generated summaries that pinpoint the root cause, affected components, and recommended fixes — no manual log diving required.
+              </p>
             </div>
+            <div className="rounded-xl bg-canvas border border-border overflow-hidden shadow-2xl max-w-sm lg:max-w-md mx-auto">
+              <img
+                src="/Quicksummary.png"
+                alt="Quick Summary"
+                className="w-full h-auto object-contain"
+                loading="lazy"
+              />
+            </div>
+          </div>
+        </FadeIn>
 
-            {/* Agent Card */}
-            <div className="flex flex-col">
-              <div className="mb-5">
-                <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-border bg-canvas mb-3">
-                  <Bot className="w-4 h-4 text-secondary" />
-                  <span className="font-mono text-xs uppercase tracking-widest text-secondary">
-                    Agent Card
-                  </span>
-                </div>
-                <h3 className="font-serif text-xl sm:text-2xl font-light text-foreground mb-2 leading-tight">
-                  Deep-dive into any agent
-                </h3>
-                <p className="text-sm lg:text-base text-muted leading-relaxed">
-                  Inspect individual agent runs with full context: inputs, outputs, tool usage, token costs, latency, and failure history at a glance.
-                </p>
+        {/* 3. Agent Card — left-right layout (reversed) */}
+        <FadeIn className="mb-20">
+          <div className="grid lg:grid-cols-2 gap-10 lg:gap-16 items-center max-w-5xl mx-auto">
+            <div className="rounded-xl bg-canvas border border-border overflow-hidden shadow-2xl max-w-sm lg:max-w-md mx-auto lg:order-1">
+              <img
+                src="/agent-card.png"
+                alt="Agent Card"
+                className="w-full h-auto object-contain"
+                loading="lazy"
+              />
+            </div>
+            <div className="lg:order-2">
+              <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full border border-border bg-canvas mb-6">
+                <Bot className="w-4 h-4 text-secondary" />
+                <span className="font-mono text-xs uppercase tracking-widest text-secondary">
+                  Agent Card
+                </span>
               </div>
-              <div className="rounded-xl bg-canvas border border-border overflow-hidden shadow-lg">
-                <img
-                  src="/agent-card.png"
-                  alt="Agent Card"
-                  className="w-full h-auto object-cover"
-                  loading="lazy"
-                />
-              </div>
+              <h3 className="font-serif text-2xl sm:text-3xl lg:text-4xl font-light text-foreground mb-4 leading-tight">
+                Deep-dive into any agent
+              </h3>
+              <p className="text-base lg:text-lg text-muted leading-relaxed max-w-xl">
+                Inspect individual agent runs with full context: inputs, outputs, tool usage, token costs, latency, and failure history at a glance.
+              </p>
             </div>
           </div>
         </FadeIn>
