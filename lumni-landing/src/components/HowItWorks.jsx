@@ -1,3 +1,4 @@
+import { AuditPipeline } from './AnimatedSignals.jsx'
 import SectionHeading from './SectionHeading.jsx'
 
 const steps = [
@@ -17,9 +18,15 @@ export default function HowItWorks() {
           title="From messy traces to clear fixes."
           description="Five steps from raw production data to actionable cost, reliability and RCA insights."
         />
+        <div className="reveal-on-scroll">
+          <AuditPipeline />
+        </div>
         <div className="mt-14 grid gap-px overflow-hidden rounded-xl border border-zinc-200 bg-zinc-200 lg:grid-cols-5">
-          {steps.map(([number, title, body]) => (
-            <div key={title} className="motion-card reveal-on-scroll bg-white p-6">
+          {steps.map(([number, title, body], index) => (
+            <div
+              key={title}
+              className={`motion-card reveal-on-scroll pipeline-node pipeline-node-delay-${index} bg-white p-6`}
+            >
               <div className="font-mono text-[12px] text-[#0047FF]">{number}</div>
               <h3 className="font-display mt-5 text-xl font-bold tracking-[-0.025em] text-zinc-950">
                 {title}

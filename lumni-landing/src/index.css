@@ -155,6 +155,295 @@ body {
   .timeline-step:nth-child(5) {
     animation-delay: 1400ms;
   }
+
+  .signal-flow-line {
+    background-image: linear-gradient(90deg, transparent, rgba(0, 71, 255, 0.92), transparent);
+    background-size: 220% 100%;
+    animation: trace-flow 2.8s linear infinite;
+  }
+
+  .waste-line {
+    background-image: linear-gradient(90deg, transparent, rgba(180, 83, 9, 0.88), transparent);
+  }
+
+  .savings-line {
+    background-image: linear-gradient(90deg, transparent, rgba(4, 120, 87, 0.9), transparent);
+  }
+
+  .vertical-flow-line {
+    background-image: linear-gradient(180deg, transparent, rgba(0, 71, 255, 0.82), transparent);
+    background-size: 100% 220%;
+    animation: vertical-trace-flow 2.4s linear infinite;
+  }
+
+  .cost-chip {
+    position: absolute;
+    z-index: 5;
+    border: 1px solid rgb(253 230 138);
+    border-radius: 999px;
+    background: rgb(255 251 235);
+    padding: 2px 8px;
+    font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, monospace;
+    font-size: 9px;
+    line-height: 1.35;
+    color: rgb(180 83 9);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    animation: cost-chip 4.8s ease-in-out infinite both;
+  }
+
+  .cost-chip-delay-0 {
+    animation-delay: 0ms;
+  }
+
+  .cost-chip-delay-1 {
+    animation-delay: 420ms;
+  }
+
+  .cost-chip-delay-2 {
+    animation-delay: 840ms;
+  }
+
+  .cost-chip-delay-3 {
+    animation-delay: 1260ms;
+  }
+
+  .cost-leak {
+    animation: cost-leak 3.8s ease-in-out infinite both;
+  }
+
+  .cost-leak-delay-0 {
+    animation-delay: 0ms;
+  }
+
+  .cost-leak-delay-1 {
+    animation-delay: 520ms;
+  }
+
+  .cost-leak-delay-2 {
+    animation-delay: 1040ms;
+  }
+
+  .waste-meter {
+    transform-origin: left center;
+    animation: waste-meter 2.8s ease-in-out infinite;
+  }
+
+  .rca-scan {
+    background: linear-gradient(180deg, transparent, rgba(0, 71, 255, 0.08), transparent);
+    animation: rca-scan 4.2s ease-in-out infinite;
+  }
+
+  .scan-row {
+    animation: scan-row 4.2s ease-in-out infinite;
+  }
+
+  .scan-row-delay-0 {
+    animation-delay: 0ms;
+  }
+
+  .scan-row-delay-1 {
+    animation-delay: 300ms;
+  }
+
+  .scan-row-delay-2 {
+    animation-delay: 600ms;
+  }
+
+  .scan-row-delay-3 {
+    animation-delay: 900ms;
+  }
+
+  .rca-cause {
+    animation: rca-cause 4.2s ease-in-out infinite;
+  }
+
+  .cost-compress {
+    animation: cost-compress 4.8s ease-in-out infinite;
+  }
+
+  .fix-reveal {
+    animation: fix-reveal 4.8s ease-in-out infinite both;
+  }
+
+  .fix-reveal-delay-0 {
+    animation-delay: 260ms;
+  }
+
+  .fix-reveal-delay-1 {
+    animation-delay: 620ms;
+  }
+
+  .fix-reveal-delay-2 {
+    animation-delay: 980ms;
+  }
+
+  .savings-meter {
+    transform-origin: left center;
+    animation: savings-meter 4.8s ease-in-out infinite;
+  }
+
+  .retry-ring {
+    animation: retry-ring 3.6s ease-in-out infinite;
+  }
+
+  .pipeline-node {
+    animation: pipeline-node 5.4s ease-in-out infinite;
+  }
+
+  .pipeline-node-delay-0 {
+    animation-delay: 0ms;
+  }
+
+  .pipeline-node-delay-1 {
+    animation-delay: 320ms;
+  }
+
+  .pipeline-node-delay-2 {
+    animation-delay: 640ms;
+  }
+
+  .pipeline-node-delay-3 {
+    animation-delay: 960ms;
+  }
+
+  .pipeline-node-delay-4 {
+    animation-delay: 1280ms;
+  }
+
+  .metric-lift {
+    animation: metric-lift 5.2s ease-in-out infinite;
+  }
+
+  .metric-lift:nth-child(2) {
+    animation-delay: 360ms;
+  }
+
+  .metric-lift:nth-child(3) {
+    animation-delay: 720ms;
+  }
+
+  .metric-lift:nth-child(4) {
+    animation-delay: 1080ms;
+  }
+
+  .hero-scan-sweep {
+    background: linear-gradient(180deg, transparent, rgba(0, 71, 255, 0.11), transparent);
+    animation: hero-scan-sweep 3.2s ease-in-out infinite;
+  }
+
+  .hero-insight {
+    animation: hero-insight 3.6s ease-in-out infinite;
+  }
+
+  .hero-insight-delay-0 {
+    animation-delay: 0ms;
+  }
+
+  .hero-insight-delay-1 {
+    animation-delay: 420ms;
+  }
+
+  .hero-insight-delay-2 {
+    animation-delay: 840ms;
+  }
+
+  .hero-insight-delay-3 {
+    animation-delay: 1260ms;
+  }
+
+  .hero-savings-meter {
+    transform-origin: left center;
+    animation: hero-savings-meter 3.6s ease-in-out infinite;
+  }
+
+  .hero-token {
+    position: absolute;
+    z-index: 5;
+    animation: hero-token-run 3.2s linear infinite both;
+  }
+
+  .hero-token-delay-0 {
+    animation-delay: 0ms;
+  }
+
+  .hero-token-delay-1 {
+    animation-delay: 420ms;
+  }
+
+  .hero-token-delay-2 {
+    animation-delay: 840ms;
+  }
+
+  .hero-token-delay-3 {
+    animation-delay: 1260ms;
+  }
+
+  .hero-cost-node {
+    animation: hero-cost-node 3.2s ease-in-out infinite;
+  }
+
+  .hero-fix-node {
+    animation: hero-fix-node 3.2s ease-in-out infinite;
+  }
+
+  .hero-path-line {
+    background-image: linear-gradient(90deg, transparent, rgba(0, 71, 255, 0.95), rgba(4, 120, 87, 0.9), transparent);
+    background-size: 220% 100%;
+    animation: hero-path-line 2.4s linear infinite;
+  }
+
+  .hero-runner {
+    animation: hero-runner 3.2s cubic-bezier(0.22, 1, 0.36, 1) infinite;
+  }
+
+  .hero-flow-node {
+    animation: hero-flow-node 3.6s ease-in-out infinite;
+  }
+
+  .hero-flow-delay-0 {
+    animation-delay: 0ms;
+  }
+
+  .hero-flow-delay-1 {
+    animation-delay: 360ms;
+  }
+
+  .hero-flow-delay-2 {
+    animation-delay: 720ms;
+  }
+
+  .hero-flow-delay-3 {
+    animation-delay: 1080ms;
+  }
+
+  .hero-flow-delay-4 {
+    animation-delay: 1440ms;
+  }
+
+  .hero-audit-card {
+    animation: hero-audit-card 4.2s ease-in-out infinite;
+  }
+
+  .hero-rca-card {
+    animation: hero-rca-card 3.6s ease-in-out infinite;
+  }
+
+  .hero-leak-chip {
+    animation: hero-leak-chip 2.8s ease-in-out infinite both;
+  }
+
+  .hero-leak-delay-0 {
+    animation-delay: 0ms;
+  }
+
+  .hero-leak-delay-1 {
+    animation-delay: 360ms;
+  }
+
+  .hero-leak-delay-2 {
+    animation-delay: 720ms;
+  }
 }
 
 @keyframes soft-rise {
@@ -201,6 +490,19 @@ body {
   }
 }
 
+@keyframes vertical-trace-flow {
+  0%,
+  100% {
+    background-position: 0 180%;
+    opacity: 0.28;
+  }
+
+  50% {
+    background-position: 0 -80%;
+    opacity: 0.9;
+  }
+}
+
 @keyframes timeline-step {
   0%,
   100% {
@@ -213,17 +515,408 @@ body {
   }
 }
 
+@keyframes cost-chip {
+  0%,
+  100% {
+    opacity: 0;
+    transform: translateX(-10px) scale(0.96);
+  }
+
+  20%,
+  72% {
+    opacity: 1;
+    transform: translateX(10px) scale(1);
+  }
+
+  86% {
+    opacity: 0;
+    transform: translateX(24px) scale(0.98);
+  }
+}
+
+@keyframes cost-leak {
+  0%,
+  100% {
+    opacity: 0.42;
+    transform: translateY(-3px);
+  }
+
+  48% {
+    opacity: 1;
+    transform: translateY(5px);
+  }
+}
+
+@keyframes waste-meter {
+  0%,
+  100% {
+    transform: scaleX(0.72);
+  }
+
+  52% {
+    transform: scaleX(1);
+  }
+}
+
+@keyframes rca-scan {
+  0%,
+  100% {
+    opacity: 0;
+    transform: translateY(-42px);
+  }
+
+  28%,
+  66% {
+    opacity: 1;
+  }
+
+  72% {
+    opacity: 0;
+    transform: translateY(118px);
+  }
+}
+
+@keyframes scan-row {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+
+  44%,
+  56% {
+    transform: translateX(3px);
+  }
+}
+
+@keyframes rca-cause {
+  0%,
+  100% {
+    opacity: 0.78;
+    transform: translateY(4px) scale(0.98);
+    box-shadow: 0 0 0 0 rgba(185, 28, 28, 0);
+  }
+
+  48%,
+  68% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    box-shadow: 0 0 0 6px rgba(185, 28, 28, 0.08);
+  }
+}
+
+@keyframes cost-compress {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+
+  48%,
+  68% {
+    transform: scale(0.92);
+  }
+}
+
+@keyframes fix-reveal {
+  0%,
+  100% {
+    opacity: 0.66;
+    transform: translateY(4px);
+  }
+
+  42%,
+  76% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes savings-meter {
+  0%,
+  100% {
+    transform: scaleX(0.22);
+  }
+
+  54%,
+  82% {
+    transform: scaleX(1);
+  }
+}
+
+@keyframes retry-ring {
+  0%,
+  100% {
+    opacity: 0.36;
+    transform: rotate(0deg) scale(0.94);
+  }
+
+  52% {
+    opacity: 0.85;
+    transform: rotate(180deg) scale(1.04);
+  }
+}
+
+@keyframes pipeline-node {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+
+  44%,
+  58% {
+    transform: translateY(-3px);
+  }
+}
+
+@keyframes metric-lift {
+  0%,
+  100% {
+    background-color: transparent;
+  }
+
+  45%,
+  58% {
+    background-color: rgba(0, 71, 255, 0.035);
+  }
+}
+
+@keyframes hero-scan-sweep {
+  0%,
+  100% {
+    opacity: 0;
+    transform: translateY(-24px);
+  }
+
+  30%,
+  68% {
+    opacity: 1;
+  }
+
+  82% {
+    opacity: 0;
+    transform: translateY(112px);
+  }
+}
+
+@keyframes hero-insight {
+  0%,
+  100% {
+    opacity: 0.68;
+    transform: translateY(4px) scale(0.98);
+    box-shadow: 0 4px 12px rgba(9, 9, 11, 0.03);
+  }
+
+  42%,
+  68% {
+    opacity: 1;
+    transform: translateY(-3px) scale(1);
+    box-shadow: 0 10px 24px rgba(9, 9, 11, 0.09);
+  }
+}
+
+@keyframes hero-savings-meter {
+  0%,
+  100% {
+    transform: scaleX(0.28);
+  }
+
+  56%,
+  82% {
+    transform: scaleX(1);
+  }
+}
+
+@keyframes hero-token-run {
+  0% {
+    opacity: 0;
+    transform: translateX(-22px) translateY(0) scale(0.94);
+  }
+
+  18%,
+  72% {
+    opacity: 1;
+    transform: translateX(14px) translateY(-1px) scale(1);
+  }
+
+  100% {
+    opacity: 0;
+    transform: translateX(44px) translateY(4px) scale(0.96);
+  }
+}
+
+@keyframes hero-cost-node {
+  0%,
+  100% {
+    transform: translateX(0);
+    box-shadow: 0 0 0 0 rgba(180, 83, 9, 0);
+  }
+
+  45%,
+  58% {
+    transform: translateX(4px);
+    box-shadow: 0 0 0 7px rgba(180, 83, 9, 0.1);
+  }
+}
+
+@keyframes hero-fix-node {
+  0%,
+  100% {
+    transform: translateX(0) scale(0.98);
+    box-shadow: 0 0 0 0 rgba(4, 120, 87, 0);
+  }
+
+  48%,
+  70% {
+    transform: translateX(-4px) scale(1);
+    box-shadow: 0 0 0 7px rgba(4, 120, 87, 0.1);
+  }
+}
+
+@keyframes hero-path-line {
+  0%,
+  100% {
+    background-position: 160% 0;
+    opacity: 0.45;
+  }
+
+  50% {
+    background-position: -70% 0;
+    opacity: 1;
+  }
+}
+
+@keyframes hero-runner {
+  0% {
+    left: 7%;
+    opacity: 0;
+    transform: scale(0.72);
+  }
+
+  12% {
+    opacity: 1;
+  }
+
+  50% {
+    left: 50%;
+    opacity: 1;
+    transform: scale(1.15);
+  }
+
+  88% {
+    opacity: 1;
+  }
+
+  100% {
+    left: calc(93% - 1rem);
+    opacity: 0;
+    transform: scale(0.72);
+  }
+}
+
+@keyframes hero-flow-node {
+  0%,
+  100% {
+    transform: translateY(0);
+    box-shadow: 0 3px 12px rgba(9, 9, 11, 0.04);
+  }
+
+  42%,
+  58% {
+    transform: translateY(-5px);
+    box-shadow: 0 12px 28px rgba(9, 9, 11, 0.1);
+  }
+}
+
+@keyframes hero-audit-card {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(-2px);
+  }
+}
+
+@keyframes hero-rca-card {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 rgba(185, 28, 28, 0);
+  }
+
+  48%,
+  68% {
+    box-shadow: 0 0 0 7px rgba(185, 28, 28, 0.08);
+  }
+}
+
+@keyframes hero-leak-chip {
+  0%,
+  100% {
+    opacity: 0;
+    transform: translateY(-6px) scale(0.94);
+  }
+
+  30%,
+  68% {
+    opacity: 1;
+    transform: translateY(8px) scale(1);
+  }
+
+  86% {
+    opacity: 0;
+    transform: translateY(22px) scale(0.96);
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
+  html,
+  body {
+    scroll-behavior: auto !important;
+  }
+
   *,
   *::before,
   *::after {
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-    scroll-behavior: auto !important;
     transition-duration: 0.01ms !important;
+  }
+
+  .soft-rise {
+    animation: none !important;
+    opacity: 1;
   }
 
   .reveal-on-scroll {
     opacity: 1;
+    transition: none !important;
+  }
+
+  .signal-flow-line,
+  .vertical-flow-line,
+  .trace-flow,
+  .cost-chip,
+  .cost-leak,
+  .waste-meter,
+  .rca-scan,
+  .scan-row,
+  .rca-cause,
+  .cost-compress,
+  .fix-reveal,
+  .savings-meter,
+  .retry-ring,
+  .pipeline-node,
+  .metric-lift,
+  .hero-scan-sweep,
+  .hero-insight,
+  .hero-savings-meter,
+  .hero-token,
+  .hero-cost-node,
+  .hero-fix-node,
+  .hero-path-line,
+  .hero-runner,
+  .hero-flow-node,
+  .hero-audit-card,
+  .hero-rca-card,
+  .hero-leak-chip {
+    animation-duration: 4.8s !important;
   }
 }

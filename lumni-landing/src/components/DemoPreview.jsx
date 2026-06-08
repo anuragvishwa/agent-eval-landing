@@ -1,4 +1,5 @@
 import { GitBranch, Route, ShieldAlert, TrendingUp } from 'lucide-react'
+import { RcaFlow, SavingsFlow, WasteFlow } from './AnimatedSignals.jsx'
 import SectionHeading from './SectionHeading.jsx'
 
 function Panel({ icon: Icon, label, title, body, children }) {
@@ -58,7 +59,7 @@ export default function DemoPreview() {
           >
             <div className="space-y-4">
               {bars.map(([name, value, width, color]) => (
-                <div key={name}>
+                <div key={name} className="metric-lift rounded-md px-1 py-0.5">
                   <div className="mb-2 flex items-center justify-between gap-3 font-mono text-[12px] text-zinc-700">
                     <span className="min-w-0 truncate">{name}</span>
                     <span>{value}</span>
@@ -68,6 +69,7 @@ export default function DemoPreview() {
                   </div>
                 </div>
               ))}
+              <WasteFlow compact />
             </div>
           </Panel>
           <Panel
@@ -80,7 +82,7 @@ export default function DemoPreview() {
               {candidates.map(([number, name, score]) => (
                 <div
                   key={name}
-                  className="flex flex-wrap items-center justify-between gap-2 rounded-md border border-zinc-200 bg-white px-3 py-2.5"
+                  className="fix-reveal flex flex-wrap items-center justify-between gap-2 rounded-md border border-zinc-200 bg-white px-3 py-2.5"
                 >
                   <div className="flex min-w-0 items-center gap-3">
                     <span className="font-mono text-[10px] text-zinc-400">{number}</span>
@@ -107,6 +109,7 @@ export default function DemoPreview() {
                   </span>
                 ))}
               </div>
+              <SavingsFlow compact />
             </div>
           </Panel>
           <Panel
@@ -117,7 +120,7 @@ export default function DemoPreview() {
           >
             <div className="grid gap-3 sm:grid-cols-3">
               {routes.map(([name, steps]) => (
-                <div key={name} className="rounded-lg border border-zinc-200 bg-zinc-50 p-4">
+                <div key={name} className="pipeline-node rounded-lg border border-zinc-200 bg-zinc-50 p-4">
                   <div className="font-mono text-[11px] text-zinc-600">{name}</div>
                   <div className="mt-5 font-display text-2xl font-bold tracking-tight text-zinc-950">
                     {steps.split(' ')[0]}
@@ -134,7 +137,7 @@ export default function DemoPreview() {
                 <span>91%</span>
               </div>
               <div className="h-2 rounded-full bg-zinc-100">
-                <div className="meter-fill h-2 w-[91%] rounded-full bg-[#0047FF]" />
+                <div className="savings-meter h-2 w-[91%] rounded-full bg-[#0047FF]" />
               </div>
             </div>
           </Panel>
@@ -158,6 +161,9 @@ export default function DemoPreview() {
               <div className="mt-4 rounded-md bg-white px-3 py-2 font-mono text-[11px] text-[#0047FF]">
                 fix · insert schema validator before tool call
               </div>
+            </div>
+            <div className="mt-4">
+              <RcaFlow compact />
             </div>
           </Panel>
         </div>

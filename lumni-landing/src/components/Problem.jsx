@@ -1,4 +1,5 @@
 import { Flame, GitBranch, Search } from 'lucide-react'
+import { FixLoop, RcaFlow, WasteFlow } from './AnimatedSignals.jsx'
 import SectionHeading from './SectionHeading.jsx'
 
 const items = [
@@ -6,16 +7,19 @@ const items = [
     icon: Flame,
     title: 'Expensive reasoning',
     body: 'Frontier models keep getting called for routing, extraction, and validation work that rules or smaller models would handle just fine.',
+    visual: WasteFlow,
   },
   {
     icon: Search,
     title: 'Unclear failures',
     body: 'When an agent fails in production, teams burn hours scrolling through traces, prompts, and tool logs to figure out what actually broke.',
+    visual: RcaFlow,
   },
   {
     icon: GitBranch,
     title: 'No optimization loop',
     body: 'Prompts and models ship without anyone knowing if cost, latency, or reliability got better or worse after the change.',
+    visual: FixLoop,
   },
 ]
 
@@ -31,6 +35,7 @@ export default function Problem() {
         <div className="mt-14 grid overflow-hidden rounded-xl border border-zinc-200 bg-zinc-200 md:grid-cols-3">
           {items.map((item) => {
             const Icon = item.icon
+            const Visual = item.visual
             return (
               <article key={item.title} className="motion-card reveal-on-scroll bg-white p-8 sm:p-9">
                 <div className="flex h-10 w-10 items-center justify-center rounded-md border border-zinc-200 bg-zinc-50 text-zinc-600">
@@ -40,6 +45,9 @@ export default function Problem() {
                   {item.title}
                 </h3>
                 <p className="mt-4 text-base leading-relaxed text-zinc-600">{item.body}</p>
+                <div className="mt-7">
+                  <Visual compact />
+                </div>
               </article>
             )
           })}

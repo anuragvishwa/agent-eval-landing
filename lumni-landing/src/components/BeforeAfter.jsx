@@ -1,4 +1,5 @@
 import { Check, X } from 'lucide-react'
+import { FixLoop, SavingsFlow, WasteFlow } from './AnimatedSignals.jsx'
 import SectionHeading from './SectionHeading.jsx'
 
 const before = [
@@ -45,12 +46,17 @@ function Flow({ tone }) {
         {isAfter && (
           <span className="absolute left-4 right-4 top-1/2 hidden h-px -translate-y-1/2 trace-flow sm:block" />
         )}
+        {!isAfter && (
+          <span className="absolute left-4 right-4 top-1/2 hidden h-px -translate-y-1/2 signal-flow-line waste-line sm:block" />
+        )}
         {nodes.map((node, index) => (
           <span
             key={node}
             className={`relative z-10 rounded-full border px-2.5 py-1 font-mono text-[9px] uppercase ${
               isAfter && index > 0
                 ? 'border-blue-200 bg-blue-50 text-[#0047FF]'
+                : !isAfter && index > 1
+                  ? 'border-amber-200 bg-amber-50 text-amber-700'
                 : 'border-zinc-200 bg-white text-zinc-500'
             }`}
           >
@@ -80,6 +86,10 @@ export default function BeforeAfter() {
             </h3>
             <List items={before} icon={X} iconClass="text-[#B91C1C]" />
             <Flow tone="before" />
+            <div className="mt-4 grid gap-4 lg:grid-cols-2">
+              <WasteFlow compact />
+              <FixLoop compact />
+            </div>
           </div>
           <div className="motion-card reveal-on-scroll stagger-1 bg-white p-7 sm:p-9">
             <div className="font-mono text-[11px] uppercase tracking-widest text-[#047857]">
@@ -90,6 +100,9 @@ export default function BeforeAfter() {
             </h3>
             <List items={after} icon={Check} iconClass="text-[#047857]" />
             <Flow tone="after" />
+            <div className="mt-4">
+              <SavingsFlow />
+            </div>
           </div>
         </div>
       </div>
