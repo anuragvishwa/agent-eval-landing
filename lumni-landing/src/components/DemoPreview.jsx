@@ -3,15 +3,19 @@ import SectionHeading from './SectionHeading.jsx'
 
 function Panel({ icon: Icon, label, title, body, children }) {
   return (
-    <div className="motion-card reveal-on-scroll relative overflow-hidden bg-white p-7">
+    <div className="motion-card reveal-on-scroll relative min-w-0 overflow-hidden bg-white p-5 sm:p-7">
       <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-[#0047FF]/35 to-transparent" />
-      <div className="mb-5 flex items-center gap-3">
+      <div className="mb-5 flex min-w-0 items-center gap-3">
         <div className="flex h-8 w-8 items-center justify-center rounded-md border border-zinc-200 bg-zinc-50 text-zinc-700">
           <Icon size={16} />
         </div>
-        <div className="font-mono text-[10px] uppercase tracking-[0.18em] text-zinc-500">{label}</div>
+        <div className="min-w-0 truncate font-mono text-[10px] uppercase tracking-[0.18em] text-zinc-500">
+          {label}
+        </div>
       </div>
-      <h3 className="font-display text-xl font-bold tracking-[-0.025em] text-zinc-950">{title}</h3>
+      <h3 className="font-display text-lg font-bold tracking-[-0.025em] text-zinc-950 sm:text-xl">
+        {title}
+      </h3>
       {body && <p className="mt-2 text-sm leading-relaxed text-zinc-600">{body}</p>}
       <div className="mt-6">{children}</div>
     </div>
@@ -55,8 +59,8 @@ export default function DemoPreview() {
             <div className="space-y-4">
               {bars.map(([name, value, width, color]) => (
                 <div key={name}>
-                  <div className="mb-2 flex items-center justify-between font-mono text-[12px] text-zinc-700">
-                    <span>{name}</span>
+                  <div className="mb-2 flex items-center justify-between gap-3 font-mono text-[12px] text-zinc-700">
+                    <span className="min-w-0 truncate">{name}</span>
                     <span>{value}</span>
                   </div>
                   <div className="h-2 rounded-full bg-zinc-100">
@@ -76,20 +80,20 @@ export default function DemoPreview() {
               {candidates.map(([number, name, score]) => (
                 <div
                   key={name}
-                  className="flex items-center justify-between rounded-md border border-zinc-200 bg-white px-3 py-2.5"
+                  className="flex flex-wrap items-center justify-between gap-2 rounded-md border border-zinc-200 bg-white px-3 py-2.5"
                 >
-                  <div className="flex items-center gap-3">
+                  <div className="flex min-w-0 items-center gap-3">
                     <span className="font-mono text-[10px] text-zinc-400">{number}</span>
-                    <span className="text-sm text-zinc-700">{name}</span>
+                    <span className="min-w-0 truncate text-sm text-zinc-700">{name}</span>
                   </div>
                   <span className="rounded-full bg-blue-50 px-2 py-0.5 font-mono text-[10px] text-[#0047FF]">
                     {score}
                   </span>
                 </div>
               ))}
-              <div className="relative mt-5 flex items-center justify-between rounded-lg border border-zinc-200 bg-zinc-50 p-4">
-                <span className="absolute left-7 right-7 top-1/2 h-px -translate-y-1/2 bg-zinc-200" />
-                <span className="absolute left-7 right-7 top-1/2 h-px -translate-y-1/2 trace-flow" />
+              <div className="relative mt-5 flex flex-wrap items-center gap-2 rounded-lg border border-zinc-200 bg-zinc-50 p-4 sm:justify-between">
+                <span className="absolute left-7 right-7 top-1/2 hidden h-px -translate-y-1/2 bg-zinc-200 sm:block" />
+                <span className="absolute left-7 right-7 top-1/2 hidden h-px -translate-y-1/2 trace-flow sm:block" />
                 {['trace', 'classify', 'workflow'].map((step, index) => (
                   <span
                     key={step}

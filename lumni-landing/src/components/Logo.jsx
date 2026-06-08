@@ -4,7 +4,9 @@ export default function Logo() {
       <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-zinc-950 text-sm font-bold text-white">
         L
       </span>
-      <span className="font-display text-lg font-bold tracking-tight text-zinc-950">Lumniverse</span>
+      <span className="font-display text-lg font-bold tracking-tight text-zinc-950 max-[360px]:hidden">
+        Lumniverse
+      </span>
     </a>
   )
 }

@@ -34,13 +34,13 @@ export default function Integrations() {
               href={href}
               target={href.startsWith('http') ? '_blank' : undefined}
               rel={href.startsWith('http') ? 'noreferrer' : undefined}
-              className="motion-card reveal-on-scroll group flex items-center justify-between gap-4 bg-white p-5"
+              className="motion-card reveal-on-scroll group flex min-w-0 items-center justify-between gap-4 bg-white p-5"
             >
-              <div className="flex items-center gap-3">
+              <div className="flex min-w-0 items-center gap-3">
                 <div className="flex h-9 w-9 items-center justify-center rounded-md border border-zinc-200 bg-zinc-50 text-zinc-700 transition-colors group-hover:border-blue-200 group-hover:bg-blue-50 group-hover:text-[#0047FF]">
                   <Boxes size={16} />
                 </div>
-                <span className="font-medium text-zinc-900">{name}</span>
+                <span className="min-w-0 truncate font-medium text-zinc-900">{name}</span>
               </div>
               <span className="flex items-center gap-1.5 font-mono text-[9px] uppercase tracking-widest text-zinc-500">
                 {status}

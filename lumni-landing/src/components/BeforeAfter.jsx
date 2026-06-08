@@ -40,9 +40,11 @@ function Flow({ tone }) {
 
   return (
     <div className="mt-9 rounded-lg border border-zinc-200 bg-zinc-50 p-4">
-      <div className="relative flex items-center justify-between gap-2 overflow-hidden">
-        <span className="absolute left-4 right-4 top-1/2 h-px -translate-y-1/2 bg-zinc-200" />
-        {isAfter && <span className="absolute left-4 right-4 top-1/2 h-px -translate-y-1/2 trace-flow" />}
+      <div className="relative flex flex-wrap items-center gap-2 overflow-hidden sm:justify-between">
+        <span className="absolute left-4 right-4 top-1/2 hidden h-px -translate-y-1/2 bg-zinc-200 sm:block" />
+        {isAfter && (
+          <span className="absolute left-4 right-4 top-1/2 hidden h-px -translate-y-1/2 trace-flow sm:block" />
+        )}
         {nodes.map((node, index) => (
           <span
             key={node}

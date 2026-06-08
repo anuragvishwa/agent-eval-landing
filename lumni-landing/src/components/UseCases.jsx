@@ -69,12 +69,14 @@ export default function UseCases() {
                   key={item.label}
                   type="button"
                   onClick={() => setActive(index)}
-                  className={`flex w-full items-center justify-between border-b border-zinc-200 px-5 py-4 text-left last:border-b-0 ${
+                  className={`flex w-full items-center gap-4 border-b border-zinc-200 px-5 py-4 text-left last:border-b-0 ${
                     active === index ? 'bg-zinc-950 text-white' : 'bg-white text-zinc-800 hover:bg-zinc-50'
                   }`}
                 >
                   <span className="font-mono text-[11px] text-current/60">0{index + 1}</span>
-                  <span className="font-display text-lg font-bold tracking-tight">{item.label}</span>
+                  <span className="min-w-0 flex-1 font-display text-base font-bold tracking-tight sm:text-lg">
+                    {item.label}
+                  </span>
                 </button>
               ))}
             </div>
@@ -84,7 +86,9 @@ export default function UseCases() {
               <div className="font-mono text-[11px] uppercase tracking-[0.18em] text-zinc-500">
                 Profile · {selected.label}
               </div>
-              <p className="mt-5 max-w-2xl text-xl leading-relaxed text-zinc-700">{selected.body}</p>
+              <p className="mt-5 max-w-2xl text-lg leading-relaxed text-zinc-700 sm:text-xl">
+                {selected.body}
+              </p>
               <div className="mt-9 grid gap-px overflow-hidden rounded-xl border border-zinc-200 bg-zinc-200 sm:grid-cols-3">
                 {selected.stats.map(([label, value]) => (
                   <div key={label} className="bg-zinc-50 p-5">
@@ -98,7 +102,7 @@ export default function UseCases() {
                 ))}
               </div>
               <div className="mt-6 rounded-xl border border-zinc-200 bg-zinc-50 p-4">
-                <div className="mb-4 flex items-center justify-between font-mono text-[10px] uppercase tracking-widest text-zinc-500">
+                <div className="mb-4 flex flex-col gap-1 font-mono text-[10px] uppercase tracking-widest text-zinc-500 min-[420px]:flex-row min-[420px]:items-center min-[420px]:justify-between">
                   <span>audit signal</span>
                   <span>live trace replay</span>
                 </div>
