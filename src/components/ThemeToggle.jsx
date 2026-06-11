@@ -9,7 +9,7 @@ const getInitialTheme = () => {
   } catch (e) {
     // Ignore storage access issues.
   }
-  return 'dark';
+  return 'light';
 };
 
 const applyTheme = (theme) => {

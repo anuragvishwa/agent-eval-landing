@@ -15,13 +15,11 @@
       (function () {
         try {
           const storedTheme = localStorage.getItem('theme');
-          const theme = storedTheme || 'dark';
+          const theme = storedTheme || 'light';
           if (theme === 'dark') {
             document.documentElement.classList.add('dark');
           }
-        } catch (e) {
-          document.documentElement.classList.add('dark');
-        }
+        } catch (e) {}
       })();
     </script>
   </head>

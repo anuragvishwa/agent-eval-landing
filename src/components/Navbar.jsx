@@ -17,7 +17,6 @@ export function Navbar() {
 
   const navLinks = [
     { label: 'Features', href: '#finops' },
-    { label: 'Pricing', href: '#pricing' },
     { label: 'Integration', href: '#integration' },
   ];
 
