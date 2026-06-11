@@ -349,3 +349,19 @@ body {
 .animate-fadeIn {
   animation: fadeIn 0.35s ease-out forwards;
 }
+
+/* Staggered row animation for capability demos */
+@keyframes staggerRow {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-staggerRow {
+  animation: staggerRow 0.4s ease-out forwards;
+}
