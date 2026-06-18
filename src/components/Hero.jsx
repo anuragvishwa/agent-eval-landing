@@ -1,4 +1,17 @@
-import { ComparisonDemo } from "./ComparisonDemo";
+import { motion } from "framer-motion";
+import { LiveOpsFeed } from "./LiveOpsFeed";
+
+const container = {
+  hidden: {},
+  show: {
+    transition: { staggerChildren: 0.12, delayChildren: 0.05 },
+  },
+};
+
+const item = {
+  hidden: { opacity: 0, y: 16 },
+  show: { opacity: 1, y: 0, transition: { duration: 0.5, ease: "easeOut" } },
+};
 
 export function Hero() {
   return (
@@ -6,27 +19,36 @@ export function Hero() {
       <div className="relative max-w-6xl mx-auto">
         <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
           {/* Left — Messaging */}
-          <div>
+          <motion.div variants={container} initial="hidden" animate="show">
             {/* Announcement Pill */}
-            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-border bg-canvas mb-8">
+            <motion.div
+              variants={item}
+              className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-border bg-canvas mb-8"
+            >
               <span className="w-2 h-4 bg-secondary animate-blink rounded-sm" />
               <span className="font-mono text-xs text-muted">AI Agent Live</span>
-            </div>
+            </motion.div>
 
             {/* Headline */}
-            <h1 className="font-serif text-4xl sm:text-5xl lg:text-6xl font-light tracking-tight text-foreground mb-6 leading-[1.1]">
+            <motion.h1
+              variants={item}
+              className="font-serif text-4xl sm:text-5xl lg:text-6xl font-light tracking-tight text-foreground mb-6 leading-[1.1]"
+            >
               Every agent failure, resolved before your users notice.
-            </h1>
+            </motion.h1>
 
             {/* Subtitle */}
-            <p className="text-lg md:text-xl text-muted max-w-xl mb-10 leading-relaxed">
+            <motion.p
+              variants={item}
+              className="text-lg md:text-xl text-muted max-w-xl mb-10 leading-relaxed"
+            >
               Lumniverse catches failures mid-run, pinpoints root cause across 7 layers, and replays agents from the exact failure point.
-            </p>
+            </motion.p>
 
             {/* CTAs */}
-            <div className="flex flex-wrap items-center gap-4 mb-10">
+            <motion.div variants={item} className="flex flex-wrap items-center gap-4 mb-10">
               <a
-                href="https://cal.com"
+                href="https://cal.com/anuragvishwa/30min"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="px-6 py-3 rounded-lg bg-foreground text-background font-medium text-sm hover:scale-[1.02] transition-transform"
@@ -39,27 +61,32 @@ export function Hero() {
               >
                 See how it works
               </a>
-            </div>
+            </motion.div>
 
             {/* Integration Pills */}
-            <div className="flex flex-wrap items-center gap-2">
+            <motion.div variants={item} className="flex flex-wrap items-center gap-2">
               {["OpenAI", "Claude", "Gemini", "Deepseek", "LangGraph"].map(
-                (item) => (
+                (label) => (
                   <span
-                    key={item}
+                    key={label}
                     className="px-3 py-1 rounded-full border border-border bg-canvas font-mono text-xs text-muted"
                   >
-                    {item}
+                    {label}
                   </span>
                 )
               )}
-            </div>
-          </div>
+            </motion.div>
+          </motion.div>
 
-          {/* Right — Comparison Demo */}
-          <div className="flex justify-center">
-            <ComparisonDemo />
-          </div>
+          {/* Right — Live Ops Feed */}
+          <motion.div
+            className="flex justify-center"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, ease: "easeOut", delay: 0.3 }}
+          >
+            <LiveOpsFeed />
+          </motion.div>
         </div>
       </div>
     </section>

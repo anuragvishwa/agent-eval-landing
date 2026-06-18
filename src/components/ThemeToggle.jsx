@@ -24,20 +24,6 @@ export function ThemeToggle({ className = '' }) {
     applyTheme(theme);
   }, [theme]);
 
-  useEffect(() => {
-    const media = window.matchMedia('(prefers-color-scheme: dark)');
-    const handleChange = (event) => {
-      try {
-        if (localStorage.getItem('theme')) return;
-      } catch (e) {
-        // Ignore storage access issues.
-      }
-      setTheme(event.matches ? 'dark' : 'light');
-    };
-    media.addEventListener('change', handleChange);
-    return () => media.removeEventListener('change', handleChange);
-  }, []);
-
   const toggleTheme = () => {
     const nextTheme = theme === 'dark' ? 'light' : 'dark';
     setTheme(nextTheme);
