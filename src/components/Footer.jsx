@@ -1,4 +1,4 @@
-import { Zap } from 'lucide-react';
+import { Zap, Linkedin } from 'lucide-react';
 
 export function Footer() {
   const currentYear = new Date().getFullYear();
@@ -87,9 +87,21 @@ export function Footer() {
           <p className="text-muted text-sm font-mono">
             © {currentYear} Lumniverse
           </p>
-          <div className="flex items-center gap-2">
-            <span className="w-2 h-2 bg-secondary rounded-full animate-blink" />
-            <span className="text-muted text-sm font-mono">All systems operational</span>
+          <div className="flex items-center gap-6">
+            <a
+              href="https://linkedin.com/in/anurag-vishwa"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-2 text-muted hover:text-foreground transition-colors"
+              aria-label="LinkedIn"
+            >
+              <Linkedin className="w-4 h-4" />
+              <span className="text-sm font-mono">LinkedIn</span>
+            </a>
+            <div className="flex items-center gap-2">
+              <span className="w-2 h-2 bg-secondary rounded-full animate-blink" />
+              <span className="text-muted text-sm font-mono">All systems operational</span>
+            </div>
           </div>
         </div>
       </div>
