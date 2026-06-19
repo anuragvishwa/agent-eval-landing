@@ -26,7 +26,9 @@ export function Hero() {
               className="inline-flex items-center gap-2 px-4 py-2 rounded-full border border-border bg-canvas mb-8"
             >
               <span className="w-2 h-4 bg-secondary animate-blink rounded-sm" />
-              <span className="font-mono text-xs text-muted">AI Agent Live</span>
+              <span className="font-mono text-xs text-muted">
+                AI Agent Live
+              </span>
             </motion.div>
 
             {/* Headline */}
@@ -34,7 +36,7 @@ export function Hero() {
               variants={item}
               className="font-serif text-4xl sm:text-5xl lg:text-6xl font-light tracking-tight text-foreground mb-6 leading-[1.1]"
             >
-              Every agent failure, resolved before your users notice.
+              Failure Intelligence for Prod AI Agents
             </motion.h1>
 
             {/* Subtitle */}
@@ -42,11 +44,14 @@ export function Hero() {
               variants={item}
               className="text-lg md:text-xl text-muted max-w-xl mb-10 leading-relaxed"
             >
-              Lumniverse catches failures mid-run, pinpoints root cause across 7 layers, and replays agents from the exact failure point.
+              Every agent failure, resolved before your users notice.
             </motion.p>
 
             {/* CTAs */}
-            <motion.div variants={item} className="flex flex-wrap items-center gap-4 mb-10">
+            <motion.div
+              variants={item}
+              className="flex flex-wrap items-center gap-4 mb-10"
+            >
               <a
                 href="https://cal.com/anuragvishwa/30min"
                 target="_blank"
@@ -64,7 +69,10 @@ export function Hero() {
             </motion.div>
 
             {/* Integration Pills */}
-            <motion.div variants={item} className="flex flex-wrap items-center gap-2">
+            <motion.div
+              variants={item}
+              className="flex flex-wrap items-center gap-2"
+            >
               {["OpenAI", "Claude", "Gemini", "Deepseek", "LangGraph"].map(
                 (label) => (
                   <span
@@ -73,7 +81,7 @@ export function Hero() {
                   >
                     {label}
                   </span>
-                )
+                ),
               )}
             </motion.div>
           </motion.div>
