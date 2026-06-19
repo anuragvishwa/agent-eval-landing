@@ -57,7 +57,7 @@ export function GlobalParticleBackground() {
       ctx.clearRect(0, 0, width, height);
 
       // Draw connections first (behind particles)
-      ctx.lineWidth = 0.6;
+      ctx.lineWidth = 0.8;
       for (let i = 0; i < particles.length; i++) {
         for (let j = i + 1; j < particles.length; j++) {
           const dx = particles[i].x - particles[j].x;
@@ -65,12 +65,12 @@ export function GlobalParticleBackground() {
           const dist = Math.sqrt(dx * dx + dy * dy);
 
           if (dist < 180) {
-            const opacity = 0.18 * (1 - dist / 180);
+            const opacity = 0.28 * (1 - dist / 180);
             // Use green for accent connections, neutral for others
             if (particles[i].isAccent || particles[j].isAccent) {
-              ctx.strokeStyle = `hsl(${theme.accent} / ${opacity * 0.7})`;
+              ctx.strokeStyle = `hsl(${theme.accent} / ${opacity * 0.85})`;
             } else {
-              ctx.strokeStyle = `hsl(${theme.base} / ${opacity * 0.45})`;
+              ctx.strokeStyle = `hsl(${theme.base} / ${opacity * 0.6})`;
             }
             ctx.beginPath();
             ctx.moveTo(particles[i].x, particles[i].y);
@@ -99,9 +99,9 @@ export function GlobalParticleBackground() {
         ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
 
         if (p.isAccent) {
-          ctx.fillStyle = `hsl(${theme.accent} / 0.55)`;
+          ctx.fillStyle = `hsl(${theme.accent} / 0.7)`;
         } else {
-          ctx.fillStyle = `hsl(${theme.base} / 0.35)`;
+          ctx.fillStyle = `hsl(${theme.base} / 0.45)`;
         }
         ctx.fill();
       });
