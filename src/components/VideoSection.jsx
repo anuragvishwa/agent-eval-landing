@@ -1,5 +1,6 @@
 import { useRef, useEffect, useState } from 'react';
 import { Play, Volume2, VolumeX, Maximize2 } from 'lucide-react';
+import demoVideo from '../assets/lumni-demo.mp4';
 
 export function VideoSection() {
   const sectionRef = useRef(null);
@@ -8,7 +9,7 @@ export function VideoSection() {
   const [isPlaying, setIsPlaying] = useState(false);
   const [isInView, setIsInView] = useState(false);
 
-  const videoUrl = 'https://lumniverse-cloud.s3.us-east-1.amazonaws.com/Lumni-trailer-with-audio.mp4';
+  const videoUrl = demoVideo;
 
   useEffect(() => {
     const observer = new IntersectionObserver(

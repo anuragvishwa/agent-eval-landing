@@ -3,11 +3,12 @@ import { Link } from 'react-router-dom';
 import { ArrowLeft, Zap } from 'lucide-react';
 import { PageShell } from '../components/PageShell';
 import { ThemeToggle } from '../components/ThemeToggle';
+import demoVideo from '../assets/lumni-demo.mp4';
 
 export function VideoPage() {
   const videoRef = useRef(null);
 
-  const videoUrl = 'https://lumniverse-cloud.s3.us-east-1.amazonaws.com/Lumni-trailer-with-audio.mp4';
+  const videoUrl = demoVideo;
 
   // Auto-play video on mount (muted for browser autoplay policy)
   useEffect(() => {
@@ -58,6 +59,8 @@ export function VideoPage() {
             <video
               ref={videoRef}
               src={videoUrl}
+              autoPlay
+              loop
               muted
               playsInline
               controls

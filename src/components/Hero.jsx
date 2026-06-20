@@ -1,4 +1,5 @@
 import { motion } from "framer-motion";
+import { Link } from "react-router-dom";
 import { LiveOpsFeed } from "./LiveOpsFeed";
 
 const container = {
@@ -36,7 +37,7 @@ export function Hero() {
               variants={item}
               className="font-serif text-4xl sm:text-5xl lg:text-6xl font-light tracking-tight text-foreground mb-6 leading-[1.1]"
             >
-              Failure Intelligence for Prod AI Agents
+              Failure Intelligence for Agents
             </motion.h1>
 
             {/* Subtitle */}
@@ -60,12 +61,12 @@ export function Hero() {
               >
                 Book a demo &rarr;
               </a>
-              <a
-                href="#capabilities"
+              <Link
+                to="/video"
                 className="px-6 py-3 rounded-lg border border-border text-foreground font-medium text-sm hover:bg-canvas transition-colors"
               >
-                See how it works
-              </a>
+                See how it works &rarr;
+              </Link>
             </motion.div>
 
             {/* Integration Pills */}

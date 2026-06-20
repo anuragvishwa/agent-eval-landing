@@ -1,4 +1,4 @@
-import { Link } from 'react-router-dom';
+import { Link } from "react-router-dom";
 
 export function CTA() {
   return (
@@ -9,7 +9,7 @@ export function CTA() {
           Get Started
         </span>
         <h2 className="font-serif text-3xl sm:text-4xl lg:text-5xl font-light text-foreground mb-6">
-          Ready to eliminate agent downtime?
+          Agents fail silently. Fix them fast
         </h2>
         <p className="text-lg md:text-xl text-muted mb-10 max-w-2xl mx-auto">
           Join leading AI engineering teams who trust Lumniverse to keep their
@@ -26,7 +26,6 @@ export function CTA() {
           >
             Book Demo
           </a>
-
         </div>
 
         {/* Trust indicators */}
