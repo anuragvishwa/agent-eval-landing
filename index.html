@@ -15,7 +15,7 @@
       (function () {
         try {
           const storedTheme = localStorage.getItem('theme');
-          const theme = storedTheme || 'light';
+          const theme = storedTheme || 'dark';
           if (theme === 'dark') {
             document.documentElement.classList.add('dark');
           }
