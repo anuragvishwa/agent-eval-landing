@@ -65,7 +65,7 @@ export function FixesSection() {
   }, []);
 
   return (
-    <section ref={ref} id="fixes" className="py-24 bg-background/80">
+    <section ref={ref} id="fixes" className="py-16 sm:py-24 bg-background/80">
       <div className="max-w-6xl mx-auto px-6">
         <div className="grid lg:grid-cols-[1fr_1.2fr] gap-12 lg:gap-16 items-center">
           {/* Left — Messaging + Comparison */}

@@ -16,7 +16,7 @@ const item = {
 
 export function Hero() {
   return (
-    <section className="relative pt-32 pb-16 px-6 overflow-hidden">
+    <section className="relative pt-28 sm:pt-32 pb-12 sm:pb-16 px-6 overflow-hidden">
       <div className="relative max-w-6xl mx-auto">
         <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
           {/* Left — Messaging */}

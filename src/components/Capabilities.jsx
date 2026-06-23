@@ -285,7 +285,7 @@ function ArchitectureGraphDemo() {
           </div>
         </StaggeredRow>
         <StaggeredRow delay={350}>
-          <div className="flex items-center gap-2 ml-24">
+          <div className="flex items-center gap-2 ml-10 sm:ml-24">
             <span className="text-muted">↘</span>
             <span className="px-2 py-1 rounded bg-canvas border border-border text-foreground">enricher</span>
             <span className="text-muted">→</span>
@@ -293,7 +293,7 @@ function ArchitectureGraphDemo() {
           </div>
         </StaggeredRow>
         <StaggeredRow delay={500}>
-          <div className="flex items-center gap-2 ml-24">
+          <div className="flex items-center gap-2 ml-10 sm:ml-24">
             <span className="text-muted">↘</span>
             <span className="px-2 py-1 rounded bg-canvas border border-border text-foreground">notifier</span>
           </div>
@@ -527,7 +527,7 @@ export function Capabilities() {
   const ActiveDemo = capabilities[active].Demo;
 
   return (
-    <section id="capabilities" className="py-24 bg-background/80">
+    <section id="capabilities" className="py-16 sm:py-24 bg-background/80">
       <div className="max-w-6xl mx-auto px-6">
         {/* Header */}
         <div className="mb-14">
@@ -580,12 +580,14 @@ export function Capabilities() {
           </div>
 
           {/* Demo Panel */}
-          <div className="rounded-xl bg-canvas border border-border p-6 relative overflow-hidden flex flex-col justify-center">
+          <div className="rounded-xl bg-canvas border border-border p-4 sm:p-6 relative overflow-hidden flex flex-col justify-center">
             <div
               key={capabilities[active].id}
-              className="animate-fadeIn"
+              className="animate-fadeIn overflow-x-auto"
             >
-              <ActiveDemo />
+              <div className="min-w-[300px]">
+                <ActiveDemo />
+              </div>
             </div>
           </div>
         </div>

@@ -107,7 +107,7 @@ export function IntegrationCode() {
   const [activeTab, setActiveTab] = useState(0);
 
   return (
-    <section id="integration" className="py-24 bg-background/80">
+    <section id="integration" className="py-16 sm:py-24 bg-background/80">
       <div className="max-w-4xl mx-auto px-6">
         {/* Header */}
         <div className="mb-10">

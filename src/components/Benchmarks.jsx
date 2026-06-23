@@ -93,7 +93,7 @@ export function Benchmarks() {
   }, []);
 
   return (
-    <section id="benchmarks" className="py-24 bg-background/80">
+    <section id="benchmarks" className="py-16 sm:py-24 bg-background/80">
       <div ref={ref} className="max-w-6xl mx-auto px-6">
         {/* Header */}
         <div className="text-center mb-14">

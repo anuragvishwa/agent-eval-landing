@@ -58,7 +58,7 @@ export function GraphSection() {
   const nodeMap = Object.fromEntries(nodes.map(n => [n.id, n]));
 
   return (
-    <section ref={ref} id="graph" className="py-24 bg-canvas/80">
+    <section ref={ref} id="graph" className="py-16 sm:py-24 bg-canvas/80">
       <div className="max-w-6xl mx-auto px-6">
         {/* Header */}
         <div className="text-center mb-12">
@@ -73,10 +73,11 @@ export function GraphSection() {
           </p>
         </div>
 
-        {/* Graph Container */}
-        <div className="relative rounded-xl bg-background border border-border overflow-hidden" style={{ minHeight: '480px' }}>
+        {/* Graph Container — scrolls horizontally on mobile so nodes don't overlap */}
+        <div className="-mx-6 px-6 overflow-x-auto sm:mx-0 sm:px-0 sm:overflow-visible">
+        <div className="relative rounded-xl bg-background border border-border overflow-hidden min-w-[600px] sm:min-w-0 min-h-[360px] sm:min-h-[480px]">
           {/* Legend */}
-          <div className="absolute top-4 right-4 z-10 space-y-3">
+          <div className="hidden sm:block absolute top-4 right-4 z-10 space-y-3">
             <div>
               <div className="font-mono text-[10px] text-muted uppercase tracking-wider mb-1.5">Status</div>
               <div className="space-y-1">
@@ -179,9 +180,10 @@ export function GraphSection() {
             );
           })}
         </div>
+        </div>
 
         {/* Comparison Bar */}
-        <div className="grid md:grid-cols-2 gap-4 mt-6">
+        <div className="grid sm:grid-cols-2 gap-4 mt-6">
           <div className="rounded-lg border border-border bg-canvas p-4">
             <div className="flex items-center gap-2 mb-1">
               <span className="font-mono text-[10px] text-red-400 uppercase">Without</span>

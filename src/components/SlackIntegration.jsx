@@ -362,18 +362,18 @@ export function SlackIntegration() {
   ];
 
   return (
-    <section ref={sectionRef} className="py-24 bg-canvas/80">
+    <section ref={sectionRef} className="py-16 sm:py-24 bg-canvas/80">
       <div className="max-w-6xl mx-auto px-6">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="text-center mb-16"
+          className="text-center mb-12 sm:mb-16"
         >
           <span className="font-mono text-xs uppercase tracking-widest text-secondary mb-4 block">
             Workflow Integration
           </span>
-          <h2 className="font-serif text-4xl md:text-5xl font-light text-foreground mb-4">
+          <h2 className="font-serif text-3xl sm:text-4xl md:text-5xl font-light text-foreground mb-4">
             Resolve incidents without leaving your team's workspace.
           </h2>
           <p className="text-lg text-muted max-w-2xl mx-auto">

@@ -2,7 +2,7 @@ import { Link } from "react-router-dom";
 
 export function CTA() {
   return (
-    <section className="py-24 bg-canvas/80 border-y border-border">
+    <section className="py-16 sm:py-24 bg-canvas/80 border-y border-border">
       <div className="max-w-4xl mx-auto px-6 text-center">
         {/* Header */}
         <span className="font-mono text-xs uppercase tracking-widest text-secondary mb-4 block">

@@ -30,7 +30,7 @@ export function SandboxSection() {
   }, [inView]);
 
   return (
-    <section ref={ref} id="sandbox" className="py-24 bg-canvas/80">
+    <section ref={ref} id="sandbox" className="py-16 sm:py-24 bg-canvas/80">
       <div className="max-w-6xl mx-auto px-6">
         <div className="grid lg:grid-cols-[1.2fr_1fr] gap-12 lg:gap-16 items-center">
           {/* Left — Product Mock */}
