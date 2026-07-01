@@ -18,6 +18,7 @@ export function Navbar() {
   const navLinks = [
     { label: 'Features', href: '#finops' },
     { label: 'Integration', href: '#integration' },
+    { label: 'Docs', href: 'https://docs.lumniverse.com', external: true },
   ];
 
   return (
@@ -48,6 +49,7 @@ export function Navbar() {
               <a
                 key={link.label}
                 href={link.href}
+                {...(link.external ? { target: '_blank', rel: 'noopener noreferrer' } : {})}
                 className="font-mono text-sm text-muted hover:text-foreground transition-colors"
               >
                 {link.label}
@@ -96,6 +98,7 @@ export function Navbar() {
                 <a
                   key={link.label}
                   href={link.href}
+                  {...(link.external ? { target: '_blank', rel: 'noopener noreferrer' } : {})}
                   className="block font-mono text-sm text-muted hover:text-foreground transition-colors"
                   onClick={() => setMobileMenuOpen(false)}
                 >
