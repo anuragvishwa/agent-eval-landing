@@ -1,5 +1,6 @@
 import { Navbar } from './components/Navbar';
 import { Hero } from './components/Hero';
+import { AccountabilityTrail } from './components/AccountabilityTrail';
 import { Benchmarks } from './components/Benchmarks';
 import { Capabilities } from './components/Capabilities';
 import { FinOpsSection } from './components/FinOpsSection';
@@ -18,6 +19,7 @@ function App() {
       <Navbar />
       <main>
         <Hero />
+        <AccountabilityTrail />
         <Benchmarks />
         <Capabilities />
         <FinOpsSection />
