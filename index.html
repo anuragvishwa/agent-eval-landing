@@ -4,13 +4,19 @@
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="description" content="Lumniverse - AI-powered RCA and incident management for AI Agents. Resolve complex agentic failures in real-time." />
+    <meta name="description" content="Lumni stops AI agents from refunding twice, writing stale data and colliding with each other and with people, and proves what really happened. 14-day trial." />
+    <meta property="og:title" content="Lumni: agents that act once, the way you meant" />
+    <meta property="og:description" content="The coordination layer for AI agents. Stops duplicate, stale and colliding actions, and proves the outcome." />
+    <meta property="og:image" content="https://lumniverse.com/lumni/og.png" />
+    <meta property="og:url" content="https://lumniverse.com/" />
+    <meta property="og:type" content="website" />
+    <meta name="twitter:card" content="summary_large_image" />
     <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)" />
-    <meta name="theme-color" content="#0b0f1a" media="(prefers-color-scheme: dark)" />
+    <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: dark)" />
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
-    <title>Lumniverse - Agent Incident -> Verified Fix</title>
+    <title>Lumni: agents that act once, the way you meant</title>
     <!-- Microsoft Clarity -->
     <script type="text/javascript">
       (function(c,l,a,r,i,t,y){
@@ -23,7 +29,7 @@
       (function () {
         try {
           const storedTheme = localStorage.getItem('theme');
-          const theme = storedTheme || 'dark';
+          const theme = window.location.pathname === '/' ? 'light' : (storedTheme || 'dark');
           if (theme === 'dark') {
             document.documentElement.classList.add('dark');
           }

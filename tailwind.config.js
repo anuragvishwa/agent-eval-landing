@@ -5,6 +5,13 @@ export default {
   theme: {
     extend: {
       colors: {
+        lm: {
+          ink: '#0d0e14', ink2: '#6a6f7d', ink3: '#a3a7b3',
+          line: '#e8e8ee', line2: '#d9dae2', canvas: '#f4f4f7', wash: '#f0f0f4', paper: '#ffffff',
+          accent: '#5b4bf5', accent2: '#8578ff', soft: '#f0eeff', accentline: '#dcd7ff',
+          allow: '#16a34a', allowbg: '#dcfce7', bad: '#b91c1c', badbg: '#fee2e2',
+          replan: '#1d4ed8', replanbg: '#dbeafe', wait: '#b45309', waitbg: '#fef3c7', pop: '#d4f56a',
+        },
         background: 'hsl(var(--background) / <alpha-value>)',
         canvas: 'hsl(var(--canvas) / <alpha-value>)',
         surface: 'hsl(var(--surface) / <alpha-value>)',
@@ -23,6 +30,7 @@ export default {
         },
       },
       fontFamily: {
+        display: ['"SF Pro Display"', '-apple-system', 'system-ui', 'Inter', '"Helvetica Neue"', 'sans-serif'],
         sans: ['Inter', 'system-ui', 'sans-serif'],
         serif: ['Georgia', 'Times New Roman', 'serif'],
         mono: ['JetBrains Mono', 'monospace'],
