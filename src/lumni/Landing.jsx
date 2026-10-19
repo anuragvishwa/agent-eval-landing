@@ -151,7 +151,7 @@ function Hero({ onFilm }) {
             <CopyCommand command={TRY_COMMAND} />
           </motion.div>
           <motion.p {...intro(0.2)} className="mt-3 text-sm text-lm-ink3">
-            <code className="font-mono text-lm-ink2">try</code> runs sample agents in your own workspace, so you see Lumni catch real mistakes. Then <code className="font-mono text-lm-ink2">npx lumniverse init</code> connects your agent.
+            <code className="font-mono text-lm-ink2">try</code> runs sample agents in a sample workspace of your own, so you see Lumni catch real mistakes. Then <code className="font-mono text-lm-ink2">npx lumniverse init</code> connects your agent.
           </motion.p>
 
           <motion.ol {...intro(0.25)} className="hidden lg:block mt-10 space-y-1">
@@ -238,7 +238,7 @@ function Catches() {
 
 function How() {
   const steps = [
-    [Eye, 'See it work', <>Sample agents make real mistakes in your workspace while Lumni catches them. <code className="block mt-1 font-mono text-[13px] text-lm-ink"><span className="text-lm-ink3">$</span> npx lumniverse try</code></>],
+    [Eye, 'See it work', <>Sample agents make real mistakes in a sample workspace while Lumni catches them. <code className="block mt-1 font-mono text-[13px] text-lm-ink"><span className="text-lm-ink3">$</span> npx lumniverse try</code></>],
     [Terminal, 'Connect your agent', <>In your agent’s folder. It starts by only watching: nothing is blocked. <code className="block mt-1 font-mono text-[13px] text-lm-ink"><span className="text-lm-ink3">$</span> npx lumniverse init</code></>],
     [ShieldCheck, 'Protect', 'Turn it on, per action, when the record shows it only stops real problems.'],
   ];
