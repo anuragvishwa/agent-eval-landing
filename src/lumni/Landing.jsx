@@ -1,7 +1,7 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { ArrowRight, Check, Copy, Eye, Github, Play, Plus, ShieldCheck, Terminal, X } from 'lucide-react';
-import { AgentTimeline } from './AgentTimeline';
+import { AgentTimeline, STEPS } from './AgentTimeline';
 import { Catalog, Features } from './Catalog';
 import {
   GITHUB_URL, NPM_URL, PRIVACY_URL, SELF_HOST_URL, SIGNIN_URL, SIGNUP_URL, TERMS_URL, TRY_COMMAND,
@@ -115,42 +115,54 @@ function Nav() {
 /* ---------- hero ---------- */
 
 function Hero({ onFilm }) {
+  const [step, setStep] = useState(0);
+  const seek = useRef(null);
+  const intro = (d) => ({ initial: { opacity: 0, y: 12 }, animate: { opacity: 1, y: 0 }, transition: { duration: 0.5, delay: d } });
   return (
-    <section className="relative bg-[#f7f7f8] pt-28 sm:pt-36 pb-16 sm:pb-24 px-5 sm:px-6 overflow-hidden">
-      <div className="max-w-[1080px] mx-auto">
-        <div className="max-w-3xl mx-auto text-center">
+    <section className="relative bg-[#f7f7f8] pt-24 sm:pt-28 pb-14 sm:pb-20 px-5 sm:px-6 overflow-hidden">
+      <div className="max-w-[1320px] mx-auto grid lg:grid-cols-[minmax(340px,440px)_minmax(0,760px)] gap-10 lg:gap-14 items-center justify-between">
+        <div>
           <motion.button
             type="button"
             onClick={onFilm}
-            initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }}
-            className="inline-flex items-center gap-2 rounded-full border border-lm-line bg-white pl-1.5 pr-3.5 py-1.5 text-sm text-lm-ink2 hover:text-lm-ink mb-7"
+            {...intro(0)}
+            className="inline-flex items-center gap-2 rounded-full border border-lm-line bg-white pl-1.5 pr-3.5 py-1.5 text-sm text-lm-ink2 hover:text-lm-ink mb-6"
           >
             <span className="rounded-full bg-lm-pop px-2 py-0.5 text-xs font-semibold text-lm-ink">Live</span>
-            Watch the 40-second film <Play className="w-3 h-3 fill-current" />
+            Watch the 40s film <Play className="w-3 h-3 fill-current" />
           </motion.button>
-          <motion.h1
-            initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: 0.05 }}
-            className="text-[42px] sm:text-[62px] lg:text-[70px] font-semibold tracking-[-0.045em] leading-[1.02]"
-          >
-            Let AI agents work together without stepping on each other.
+          <motion.h1 {...intro(0.05)} className="text-[40px] sm:text-[52px] font-semibold tracking-[-0.045em] leading-[1.03]">
+            AI agents that don’t step on each other.
           </motion.h1>
-          <motion.p
-            initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: 0.12 }}
-            className="mt-6 text-lg sm:text-xl text-lm-ink2 leading-relaxed max-w-2xl mx-auto"
-          >
-            Lumni checks every action your agents take before it runs. It stops repeats, catches stale data, lets people go first, asks you when it matters, and proves the work really happened.
+          <motion.p {...intro(0.1)} className="mt-5 text-lg text-lm-ink2 leading-relaxed">
+            Lumni checks every action before it runs. No double refunds, no stale writes, no surprises.
           </motion.p>
-          <motion.div
-            initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, delay: 0.2 }}
-            className="mt-8 flex flex-wrap items-center justify-center gap-3"
-          >
-            <Primary>Start free for 14 days <ArrowRight className="w-4 h-4" /></Primary>
+          <motion.div {...intro(0.15)} className="mt-7 flex flex-wrap items-center gap-3">
+            <Primary>Start free <ArrowRight className="w-4 h-4" /></Primary>
             <CopyCommand command={TRY_COMMAND} />
           </motion.div>
+
+          <motion.ol {...intro(0.25)} className="hidden lg:block mt-10 space-y-1">
+            {STEPS.map((s, i) => (
+              <li key={s.label}>
+                <button
+                  type="button"
+                  onClick={() => seek.current?.(i)}
+                  className={`w-full text-left rounded-xl px-3 py-2 transition-colors ${i === step ? 'bg-white shadow-sm ring-1 ring-lm-accentline' : 'hover:bg-white/60'}`}
+                >
+                  <div className="flex items-center gap-2.5">
+                    <span className={`w-5 h-5 shrink-0 rounded-full text-[11px] font-semibold flex items-center justify-center ${i === step ? 'bg-lm-accent text-white' : 'bg-lm-wash text-lm-ink3'}`}>{i + 1}</span>
+                    <span className={`text-[15px] font-semibold ${i === step ? 'text-lm-ink' : 'text-lm-ink3'}`}>{s.label}</span>
+                  </div>
+                  {i === step && <p className="mt-0.5 pl-[30px] text-sm text-lm-ink2">{s.text}</p>}
+                </button>
+              </li>
+            ))}
+          </motion.ol>
         </div>
 
-        <motion.div initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7, delay: 0.3 }} className="mt-14 sm:mt-16">
-          <AgentTimeline />
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, delay: 0.2 }} className="min-w-0">
+          <AgentTimeline onStep={setStep} seekRef={seek} />
         </motion.div>
       </div>
     </section>
@@ -428,7 +440,7 @@ function End() {
 
 function Footer() {
   const links = [
-    ['GitHub', GITHUB_URL], ['npm', NPM_URL], ['Self-hosting', SELF_HOST_URL], ['Privacy', PRIVACY_URL], ['Terms', TERMS_URL], ['Contact', 'mailto:privacy@lumniverse.com'],
+    ['GitHub', GITHUB_URL], ['npm', NPM_URL], ['llms.txt', '/llms.txt'], ['Self-hosting', SELF_HOST_URL], ['Privacy', PRIVACY_URL], ['Terms', TERMS_URL], ['Contact', 'mailto:privacy@lumniverse.com'],
   ];
   return (
     <footer className="border-t border-lm-line py-10 px-5 sm:px-6">

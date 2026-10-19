@@ -1,16 +1,14 @@
 import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { Briefcase, Check, Headphones, Receipt, RotateCw, Server, Sparkles, Tag, TriangleAlert, User, X } from 'lucide-react';
-import { canAnimate } from './motion';
 
 // A scripted, real-looking day in a Lumni workspace. Time `t` runs in seconds;
 // bars drift left as time passes, Lumni steps in, and a cursor approves a refund.
 const LOOP = 21;
-const WINDOW = 30; // seconds visible across the track (~30 minutes on the axis)
-const DESIGN_W = 1040;
-const LABEL_W = 214;
+const WINDOW = 24; // seconds visible across the track (~30 minutes on the axis)
+const DESIGN_W = 760;
+const LABEL_W = 178;
 const TRACK_W = DESIGN_W - LABEL_W - 40;
-const ROW_H = 58;
-const STATIC_T = 13.9;
+const ROW_H = 54;
 
 const APPS = {
   S: { l: 'S', bg: '#635bff' }, // Stripe
@@ -65,14 +63,14 @@ export const STEPS = [
 
 // Cursor path in design px relative to the track's left edge and the body top.
 const CURSOR = [
-  { t: 11.9, x: 520, y: 420, o: 0 },
-  { t: 12.3, x: 520, y: 400, o: 1 },
-  { t: 13.0, x: TRACK_W - 140, y: 5 * ROW_H + 30, o: 1 },
-  { t: 14.4, x: TRACK_W - 140, y: 5 * ROW_H + 30, o: 1 },
-  { t: 15.0, x: TRACK_W - 46, y: 5 * ROW_H - 34, o: 1 },
-  { t: 15.5, x: TRACK_W - 46, y: 5 * ROW_H - 34, o: 1 },
-  { t: 16.3, x: TRACK_W - 260, y: 5 * ROW_H + 70, o: 1 },
-  { t: 16.8, x: TRACK_W - 280, y: 5 * ROW_H + 80, o: 0 },
+  { t: 11.9, x: 360, y: 300, o: 0 },
+  { t: 12.3, x: 360, y: 290, o: 1 },
+  { t: 13.0, x: TRACK_W - 120, y: 5 * ROW_H + 28, o: 1 },
+  { t: 14.4, x: TRACK_W - 120, y: 5 * ROW_H + 28, o: 1 },
+  { t: 15.0, x: TRACK_W - 44, y: 5 * ROW_H - 46, o: 1 },
+  { t: 15.5, x: TRACK_W - 44, y: 5 * ROW_H - 46, o: 1 },
+  { t: 16.3, x: TRACK_W - 230, y: 5 * ROW_H + 20, o: 1 },
+  { t: 16.8, x: TRACK_W - 250, y: 5 * ROW_H + 26, o: 0 },
 ];
 
 const ease = (k) => (k < 0.5 ? 2 * k * k : 1 - (-2 * k + 2) ** 2 / 2);
@@ -125,10 +123,10 @@ function Bar({ bar, t }) {
   if (right < 4) return null;
   const st = stateAt(bar, t);
   const width = right - Math.max(left, -40);
-  const wide = width > 210;
+  const wide = width > 200;
   return (
     <div
-      className={`absolute top-[12px] h-[34px] rounded-[10px] flex items-center gap-2 px-2.5 text-[14px] font-medium whitespace-nowrap overflow-hidden ${STYLE[st]}`}
+      className={`absolute top-[11px] h-[32px] rounded-[9px] flex items-center gap-1.5 px-2 text-[13px] font-medium whitespace-nowrap overflow-hidden ${STYLE[st]}`}
       style={{
         left: Math.max(left, -40),
         width,
@@ -163,8 +161,9 @@ function useLoop(active) {
     const v = typeof window === 'undefined' ? null : new URLSearchParams(window.location.search).get('t');
     return v === null ? null : Number(v);
   });
-  const [animate] = useState(() => frozen === null && canAnimate());
-  const [t, setT] = useState(frozen ?? (animate ? 0 : STATIC_T));
+  // Always plays, whatever the system's motion setting: the scene is the explanation.
+  const animate = frozen === null;
+  const [t, setT] = useState(frozen ?? 0);
   const tRef = useRef(t);
   const jump = (to) => {
     tRef.current = to;
@@ -187,7 +186,7 @@ function useLoop(active) {
   return [t, jump, animate, frozen !== null];
 }
 
-export function AgentTimeline() {
+export function AgentTimeline({ onStep, seekRef }) {
   const outer = useRef(null);
   const [scale, setScale] = useState(1);
   const [visible, setVisible] = useState(true);
@@ -219,7 +218,6 @@ export function AgentTimeline() {
     if (live.some((b) => states[b.id] === 'needs')) return ['Needs you', 'bg-[#fff1dc] text-[#b45309]'];
     if (live.some((b) => states[b.id] === 'wait')) return ['Waiting', 'bg-[#e8f0ff] text-[#1f5fd6]'];
     if (live.some((b) => states[b.id] === 'person')) return ['Editing', 'bg-[#f3f8df] text-[#5a6b16]'];
-    if (!live.length) return LANES[i].person ? null : ['Idle', 'bg-lm-wash text-lm-ink2'];
     return null;
   };
 
@@ -234,6 +232,8 @@ export function AgentTimeline() {
   const popOpen = t >= 13.1 && t < 15.55;
   const pressed = t >= 15.15 && t < 15.55;
   const step = STEPS.reduce((acc, s, i) => (t >= s.t - 0.2 ? i : acc), 0);
+  useEffect(() => { onStep?.(step); }, [step, onStep]);
+  if (seekRef) seekRef.current = (i) => jump(STEPS[i].t - 0.25);
 
   // the dashed link between the original refund and the stopped copy
   const showLink = t >= 3.3 && states.refundB === 'stopped';
@@ -242,29 +242,30 @@ export function AgentTimeline() {
 
   return (
     <div>
-      <div ref={outer} className="w-full overflow-x-auto overflow-y-hidden [scrollbar-width:none] [&::-webkit-scrollbar]:hidden" style={{ height: (ROW_H * LANES.length + 128) * scale }}>
+      <div ref={outer} className="w-full overflow-x-auto overflow-y-hidden [scrollbar-width:none] [&::-webkit-scrollbar]:hidden" style={{ height: (ROW_H * LANES.length + 110) * scale }}>
         <div style={{ width: DESIGN_W * scale, overflow: 'hidden' }}>
         <div
+          data-t={t.toFixed(2)}
           className="origin-top-left rounded-[20px] border border-[#ececf0] bg-white shadow-[0_1px_2px_rgba(16,16,30,0.04),0_30px_80px_-40px_rgba(40,30,120,0.28)] overflow-hidden select-none"
           style={{ width: DESIGN_W, transform: `scale(${scale})` }}
         >
           {/* header */}
-          <div className="flex items-center gap-3 px-6 h-[60px] border-b border-[#f0f0f3]">
+          <div className="flex items-center gap-2.5 px-5 h-[54px] border-b border-[#f0f0f3]">
             <Sparkles className="w-[18px] h-[18px] text-lm-accent" />
-            <span className="text-[17px] font-semibold">Agents</span>
-            <span className="flex items-center gap-1.5 text-[15px] text-lm-ink2"><span className="w-2 h-2 rounded-full bg-[#3b82f6]" />{running} running</span>
-            {needs > 0 && <span className="flex items-center gap-1.5 text-[15px] text-[#c2570c]"><span className="w-2 h-2 rounded-full bg-[#f08a24]" />{needs} needs you</span>}
-            <span className="flex items-center gap-1.5 text-[15px] text-lm-accent"><span className="w-2 h-2 rounded-full bg-lm-accent" />Lumni checking every action</span>
-            <span className="ml-auto rounded-lg bg-lm-wash px-3 py-1 text-[14px] font-medium text-lm-ink2">Last 30m</span>
+            <span className="text-[16px] font-semibold">Agents</span>
+            <span className="flex items-center gap-1.5 text-[14px] text-lm-ink2"><span className="w-2 h-2 rounded-full bg-[#3b82f6]" />{running} running</span>
+            {needs > 0 && <span className="flex items-center gap-1.5 text-[14px] text-[#c2570c]"><span className="w-2 h-2 rounded-full bg-[#f08a24]" />{needs} needs you</span>}
+            <span className="flex items-center gap-1.5 text-[14px] text-lm-accent"><span className="w-2 h-2 rounded-full bg-lm-accent" />Lumni on</span>
+            <span className="ml-auto rounded-lg bg-lm-wash px-2.5 py-1 text-[13px] font-medium text-lm-ink2">Last 30m</span>
           </div>
 
-          <div className="relative px-5 pb-4" style={{ opacity: fade }}>
+          <div className="relative px-5 pb-3" style={{ opacity: fade }}>
             {/* axis */}
-            <div className="relative h-[46px]" style={{ marginLeft: LABEL_W }}>
+            <div className="relative h-[40px]" style={{ marginLeft: LABEL_W }}>
               {[25, 20, 15, 10, 5].map((m) => (
-                <span key={m} className="absolute top-[16px] -translate-x-1/2 text-[13px] text-lm-ink3" style={{ left: TRACK_W * (1 - m / 30) }}>−{m}m</span>
+                <span key={m} className="absolute top-[13px] -translate-x-1/2 text-[12px] text-lm-ink3" style={{ left: TRACK_W * (1 - m / 30) }}>−{m}m</span>
               ))}
-              <span className="absolute top-[13px] -translate-x-full rounded-md bg-[#e8f0ff] px-1.5 py-0.5 text-[12px] font-semibold text-[#1f5fd6]" style={{ left: TRACK_W }}>now</span>
+              <span className="absolute top-[10px] -translate-x-full rounded-md bg-[#e8f0ff] px-1.5 py-0.5 text-[12px] font-semibold text-[#1f5fd6]" style={{ left: TRACK_W }}>now</span>
             </div>
 
             <div className="relative">
@@ -272,16 +273,16 @@ export function AgentTimeline() {
                 const status = laneStatus(i);
                 return (
                   <div key={lane.name} className="flex items-center border-b border-[#f4f4f6] last:border-0" style={{ height: ROW_H }}>
-                    <div className="flex items-center gap-3 shrink-0" style={{ width: LABEL_W }}>
-                      <span className={`w-9 h-9 rounded-[10px] border flex items-center justify-center ${lane.person ? 'border-[#dfe9b4] bg-[#f6fae6]' : 'border-[#ececf0] bg-white'}`}>
-                        <lane.Icon className={`w-[17px] h-[17px] ${lane.person ? 'text-[#5a6b16]' : 'text-lm-ink'}`} />
+                    <div className="flex items-center gap-2.5 shrink-0" style={{ width: LABEL_W }}>
+                      <span className={`shrink-0 w-8 h-8 rounded-[9px] border flex items-center justify-center ${lane.person ? 'border-[#dfe9b4] bg-[#f6fae6]' : 'border-[#ececf0] bg-white'}`}>
+                        <lane.Icon className={`w-[15px] h-[15px] ${lane.person ? 'text-[#5a6b16]' : 'text-lm-ink'}`} />
                       </span>
                       <div className="min-w-0">
                         <div className="flex items-center gap-1.5">
-                          <span className="text-[15px] font-semibold">{lane.name}</span>
+                          <span className="text-[14px] font-semibold whitespace-nowrap">{lane.name}</span>
                           {status && <span className={`rounded-md px-1.5 py-px text-[11px] font-semibold ${status[1]}`}>{status[0]}</span>}
                         </div>
-                        <div className="text-[13px] text-lm-ink2">{lane.sub}</div>
+                        <div className="text-[12px] text-lm-ink2">{lane.sub}</div>
                       </div>
                     </div>
                   </div>
@@ -314,12 +315,12 @@ export function AgentTimeline() {
                 {TIPS.filter((tip) => t >= tip.from && t < tip.to).map((tip) => {
                   const box = barBox(tip.bar);
                   const k = Math.min(1, (t - tip.from) / 0.2, (tip.to - t) / 0.2);
-                  const x = Math.max(8, Math.min(TRACK_W - 330, box.left + 12));
+                  const x = Math.max(4, Math.min(TRACK_W - 284, box.left + 12));
                   return (
                     <div
                       key={tip.title}
-                      className="absolute w-[320px] rounded-xl bg-[#17171c] text-white px-3.5 py-3 shadow-xl"
-                      style={{ left: x, top: box.top > 3 * ROW_H ? box.top - 74 : box.top + 52, opacity: k, transform: `translateY(${(1 - k) * 6}px)`, zIndex: 5 }}
+                      className="absolute w-[280px] rounded-xl bg-[#17171c] text-white px-3.5 py-3 shadow-xl"
+                      style={{ left: x, top: box.top > 3 * ROW_H ? box.top - 72 : box.top + 48, opacity: k, transform: `translateY(${(1 - k) * 6}px)`, zIndex: 5 }}
                     >
                       <div className="text-[12px] font-semibold text-[#b9b2ff] mb-1">{tip.title}</div>
                       {tip.lines.map((l) => (
@@ -331,8 +332,8 @@ export function AgentTimeline() {
 
                 {popOpen && (
                   <div
-                    className="absolute w-[300px] rounded-2xl bg-white border border-[#ececf0] shadow-[0_20px_50px_-12px_rgba(16,16,30,0.3)] p-4"
-                    style={{ left: TRACK_W - 300, top: 5 * ROW_H - 132, opacity: Math.min(1, (t - 13.1) / 0.18, (15.55 - t) / 0.12), zIndex: 6 }}
+                    className="absolute w-[272px] rounded-2xl bg-white border border-[#ececf0] shadow-[0_20px_50px_-12px_rgba(16,16,30,0.3)] p-4"
+                    style={{ left: TRACK_W - 272, top: 5 * ROW_H - 136, opacity: Math.min(1, (t - 13.1) / 0.18, (15.55 - t) / 0.12), zIndex: 6 }}
                   >
                     <div className="text-[15px] font-semibold">Refund $900 to Globex?</div>
                     <p className="mt-1 text-[13px] text-lm-ink2 leading-snug">Over your $500 rule. Ops agent asked 4 min ago. Nothing else touched this order.</p>
@@ -355,22 +356,10 @@ export function AgentTimeline() {
         </div>
       </div>
 
-      {/* what's happening, and a way to jump to it */}
-      <div className="mt-6 grid grid-cols-1 sm:grid-cols-5 gap-2">
-        {STEPS.map((s, i) => (
-          <button
-            key={s.label}
-            type="button"
-            onClick={() => jump(s.t - 0.25)}
-            className={`text-left rounded-xl px-3.5 py-3 transition-colors border ${i === step ? 'bg-white border-lm-accentline shadow-sm' : 'hidden sm:block border-transparent hover:bg-white/60'}`}
-          >
-            <div className="flex items-center gap-2">
-              <span className={`w-5 h-5 rounded-full text-[11px] font-semibold flex items-center justify-center ${i === step ? 'bg-lm-accent text-white' : 'bg-lm-wash text-lm-ink2'}`}>{i + 1}</span>
-              <span className={`text-sm font-semibold ${i === step ? 'text-lm-ink' : 'text-lm-ink2'}`}>{s.label}</span>
-            </div>
-            <p className={`mt-1.5 text-[13px] leading-snug ${i === step ? 'text-lm-ink2' : 'text-lm-ink3'}`}>{s.text}</p>
-          </button>
-        ))}
+      {/* phones: the current step under the panel (wide screens list them beside it) */}
+      <div className="lg:hidden mt-4 rounded-xl bg-white border border-lm-accentline px-4 py-3">
+        <div className="text-sm font-semibold">{step + 1}. {STEPS[step].label}</div>
+        <p className="mt-0.5 text-[13px] text-lm-ink2">{STEPS[step].text}</p>
       </div>
     </div>
   );

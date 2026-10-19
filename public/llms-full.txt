@@ -1,0 +1,718 @@
+# Lumni
+
+> Lumni is the coordination layer for AI agents. Before an agent takes a consequential action (a refund, an email, a CRM write, a deploy), it asks Lumni; Lumni checks the action against what is true now and what other agents and people are doing, and answers ALLOW, DEDUPLICATE, WAIT, REPLAN, REQUIRE_APPROVAL or REJECT. Afterwards Lumni verifies the result in the target app instead of trusting the tool call. No LLM decides; the hard path is deterministic.
+
+Key facts:
+
+- Cloud: https://app.lumniverse.com (14-day trial, then $49/month with 50,000 checks, $3 per extra 1,000). Self-host with Docker Compose. Server and console are FSL-1.1 (Apache-2.0 after two years); SDKs, CLI, skills and examples are Apache-2.0.
+- Connect an agent: `npx lumniverse init` in its folder (writes `LUMNI_URL` and `LUMNI_API_KEY`). Try sample agents: `npx lumniverse try`. Look around with no account: `npx lumniverse demo`.
+- SDKs: TypeScript `@lumniverse/sdk` (Node 22+), Python `lumni-sdk` (3.10+), Go `github.com/lumnihq/lumni/sdk/go`. Adapters for LangGraph, OpenAI Agents, Temporal, Restate, and an MCP gateway.
+- Core call: `checkAction({ actor_id, work_id, operation, effect_key, resources, arguments, metadata })`, then act only if `shouldExecute(decision)`, then `startAction` and `reportResult`.
+- `effect_key` names the real-world effect (e.g. `refund:<order id>`): the same key means the same effect, which happens once.
+- New workspaces run in shadow mode: decisions come back as `WOULD_*` and nothing is blocked until enforcement is turned on.
+
+## Docs
+
+- [Lumni skill for coding agents](https://raw.githubusercontent.com/lumnihq/lumni/main/skills/lumni/SKILL.md): how to add Lumni to an agent, field by field, and how to handle each decision
+- [README](https://raw.githubusercontent.com/lumnihq/lumni/main/README.md): what Lumni is, getting started, licensing
+- [Getting started](https://raw.githubusercontent.com/lumnihq/lumni/main/docs/getting-started.md): one complete workflow, end to end
+- [SDKs](https://raw.githubusercontent.com/lumnihq/lumni/main/docs/sdk.md): Go, TypeScript and Python clients and durable runtimes
+- [TypeScript SDK](https://raw.githubusercontent.com/lumnihq/lumni/main/sdk/typescript/README.md) and [Python SDK](https://raw.githubusercontent.com/lumnihq/lumni/main/sdk/python/README.md)
+- [API](https://raw.githubusercontent.com/lumnihq/lumni/main/docs/api.md): authentication, admission and decisions; the full contract is [api/openapi.yaml](https://raw.githubusercontent.com/lumnihq/lumni/main/api/openapi.yaml)
+- [Integrations](https://raw.githubusercontent.com/lumnihq/lumni/main/docs/integrations.md): MCP gateway, OpenTelemetry, GitHub, webhooks
+
+## Running Lumni
+
+- [Self-hosting](https://raw.githubusercontent.com/lumnihq/lumni/main/docs/self-hosting.md): Docker Compose, HTTPS, updates
+- [Configuration](https://raw.githubusercontent.com/lumnihq/lumni/main/docs/configuration.md)
+- [How coordination works](https://raw.githubusercontent.com/lumnihq/lumni/main/docs/coordination.md)
+
+## Optional
+
+- [Examples](https://github.com/lumnihq/lumni/tree/main/examples): minimal agents in TypeScript, Python and Go, Temporal and Restate workers, and `agent-fleet` (agents that make realistic mistakes)
+- [Security](https://raw.githubusercontent.com/lumnihq/lumni/main/SECURITY.md)
+- [Privacy policy](https://app.lumniverse.com/privacy) and [terms](https://app.lumniverse.com/terms)
+- [Everything above in one file](https://lumniverse.com/llms-full.txt)
+
+---
+
+<!-- source: https://github.com/lumnihq/lumni/blob/main/skills/lumni/SKILL.md -->
+
+---
+name: lumni
+description: Add Lumni to an AI agent so each consequential action (refund, email, CRM write, deploy, ticket change) is checked before it runs, happens once, waits for people and other agents, and is proven afterwards. Use when the user mentions Lumni or lumniverse, asks to stop agents from duplicating, colliding or overwriting work, wants approvals for risky agent actions, or asks to wrap tool calls with checkAction / check_action / shouldExecute.
+---
+
+# Integrating Lumni into an agent
+
+Lumni sits between AI agents and the systems they change. Before a consequential action runs, the agent asks Lumni; Lumni answers with a decision; the agent acts only when the decision allows it, then reports what happened. Lumni never runs the action itself and never uses an LLM to decide.
+
+Only wrap actions that **change something outside the agent**: payments, refunds, emails, messages, CRM/DB writes, tickets, deploys. Leave reads, model calls and pure computation alone.
+
+## 1. Connect
+
+In the agent's project folder:
+
+```bash
+npx lumniverse init
+```
+
+It opens the browser to approve, writes `LUMNI_URL` and `LUMNI_API_KEY` to `.env`, and prints the lines to add. Don't invent keys; if `.env` has no `LUMNI_API_KEY`, ask the user to run this (sign-up is at https://app.lumniverse.com; self-hosted consoles use `npx lumniverse init --console <url>`).
+
+Install the SDK for the agent's language:
+
+| Language | Install | Import |
+|---|---|---|
+| TypeScript / Node 22+ | `npm install @lumniverse/sdk` | `import { LumniClient, shouldExecute } from '@lumniverse/sdk'` |
+| Python 3.10+ | `pip install lumni-sdk` | `from lumni import Client, should_execute` |
+| Go | `go get github.com/lumnihq/lumni/sdk/go` | `import lumni "github.com/lumnihq/lumni/sdk/go"`, then `lumni.New(url, key)` |
+
+## 2. Wrap each consequential action
+
+TypeScript:
+
+```ts
+const lumni = new LumniClient(process.env.LUMNI_URL!, process.env.LUMNI_API_KEY!);
+
+const d = await lumni.checkAction({
+  actor_id: 'support-agent',            // which agent (stable name)
+  work_id: ticket.id,                   // the task this belongs to
+  operation: 'stripe.refund',           // app.verb
+  effect_key: `refund:${order.id}`,     // the real-world effect: same key = same effect, happens once
+  arguments: { charge: chargeId, amount: 64 },
+  resources: [{ type: 'order', external_id: order.id, mode: 'WRITE' }],
+  metadata: { summary: `Refund $64 for order ${order.id}`, amount: 64, customer: order.customerName },
+});
+
+if (shouldExecute(d)) {
+  await lumni.startAction(d.action_id, d.lease_token);
+  try {
+    const refund = await stripe.refunds.create({ charge: chargeId });
+    await lumni.reportResult(d.action_id, { status: 'SUCCEEDED', lease_token: d.lease_token, external_result_id: refund.id, output: { id: refund.id } });
+  } catch (e) {
+    await lumni.reportResult(d.action_id, { status: 'FAILED', lease_token: d.lease_token, output: { error: String(e) } });
+    throw e;
+  }
+} else {
+  // handle the decision: see section 3
+}
+```
+
+Python:
+
+```python
+lumni = Client(os.environ["LUMNI_URL"], os.environ["LUMNI_API_KEY"])
+d = lumni.check_action({
+    "actor_id": "support-agent", "work_id": ticket_id, "operation": "stripe.refund",
+    "effect_key": f"refund:{order_id}",
+    "resources": [{"type": "order", "external_id": order_id, "mode": "WRITE"}],
+    "metadata": {"summary": f"Refund $64 for order {order_id}", "amount": 64},
+})
+if should_execute(d):
+    lumni.start_action(d["action_id"], d.get("lease_token", ""))
+    refund = stripe.Refund.create(charge=charge_id)
+    lumni.report_result(d["action_id"], {"status": "SUCCEEDED", "lease_token": d.get("lease_token"), "external_result_id": refund.id})
+```
+
+Go: `d, err := client.CheckAction(ctx, protocol.ActionCheckInput{...})`, then `lumni.RequireExecution(d)`, `client.StartAction`, `client.ReportResult`.
+
+### Choosing the fields well (this is what makes Lumni correct)
+
+- **`effect_key`**: name the *effect in the world*, not the attempt. Two agents refunding the same order must produce the same key (`refund:<order>`); two different refunds must not. Never put a random ID, timestamp or the agent's name in it.
+- **`resources`**: every record the action reads or writes, with `mode` `READ` or `WRITE`. Use the external system's real ID (`external_id`). This is how Lumni sees two agents (or an agent and a person) on the same record.
+- **Stale data**: when the agent decided based on a value it read, send `observed_version` (an ETag, `updated_at`, revision number) and `version_source` on that resource. Lumni returns `REPLAN` if it changed since.
+- **`work_id`**: one per task/run/ticket, so related actions group together.
+- **`metadata`**: optional `summary`, `amount` (dollars), `customer`, `app`; the console uses them.
+- Keep `action_id` stable across retries of the *same* attempt (the SDK generates one if omitted); a retry with a new `action_id` is a new attempt.
+- Always report a terminal result (`SUCCEEDED`, `FAILED` or `UNKNOWN`) after you started. `UNKNOWN` is right when the call timed out and you can't tell.
+
+## 3. Handle every decision
+
+`shouldExecute(d)` is true for `ALLOW`, `WARN` and every `WOULD_*` decision. New workspaces start in **shadow mode**: decisions come back as `WOULD_*`, everything is let through, and the console shows what Lumni would have stopped. Write the handling below anyway; it applies once the user turns enforcement on.
+
+| Decision | Meaning | What the agent should do |
+|---|---|---|
+| `ALLOW` / `WARN` | Go ahead | Start, act, report result. Pass `lease_token` on start/result. |
+| `DEDUPLICATE` | This effect already happened (`existing_action_id`) | Don't act. Treat as done; don't report a result for this action. |
+| `WAIT` | Someone else (agent or person) holds the record, or a dependency isn't done | Sleep `retry_after_ms` (bounded), then check the same action again. |
+| `REPLAN` | Data the agent used is stale, or the work was superseded | Re-read the resource and re-decide; send a fresh check. If `reason_code` is `WORK_SUPERSEDED`, `WORK_CANCELLED` or `ACTION_SUPERSEDED`, stop instead. |
+| `REQUIRE_APPROVAL` | A person must decide (`approval_id`) | Poll `approval(approval_id)` until not `PENDING` (or resume on an event). If `APPROVED`, check the **same** `action_id` again; otherwise don't act. |
+| `REJECT` | Not allowed by policy | Don't act; surface `reason_code` to the user/logs. |
+
+Bound every loop (retries, wait time, approval wait). Never retry a refused action by changing its `effect_key`.
+
+## 4. Framework adapters (prefer these when the project uses the framework)
+
+- **LangGraph (TS)**: `import { langgraphTool } from '@lumniverse/sdk/langgraph'`; wrap the side-effecting function: `langgraphTool(new ExternalClient(lumni), input => action, input => doIt(input))`. Needs a checkpointer; pending decisions become LangGraph interrupts.
+- **OpenAI Agents (TS)**: `import { openaiTool } from '@lumniverse/sdk/openai'`; `openaiTool(tool, new ExternalClient(lumni), (input, callId) => action)` uses the SDK's `needsApproval` boundary.
+- **Python**: `pip install "lumni-sdk[langgraph]"` or `"lumni-sdk[openai]"` for the same adapters.
+- **Temporal / Restate (Go)**: adapters in `adapters/temporal` and `adapters/restate` map decisions to durable timers and signals.
+- **MCP**: put the Lumni gateway in front of an MCP server instead of changing agent code; see `docs/integrations.md` in github.com/lumnihq/lumni.
+
+## 5. Check your work
+
+1. Run the agent once; the action should appear in the console (app.lumniverse.com → Flow) with a `WOULD_*` or `ALLOW` decision.
+2. Trigger the same effect twice (run the step again): the second should be `DEDUPLICATE` (or `WOULD_DEDUPLICATE` in shadow mode).
+3. To see every decision type without touching the user's agent: `npx lumniverse try`.
+
+Docs: https://github.com/lumnihq/lumni (docs/sdk.md, docs/api.md, docs/getting-started.md). Full reference for LLMs: https://lumniverse.com/llms-full.txt
+
+---
+
+<!-- source: https://github.com/lumnihq/lumni/blob/main/README.md -->
+
+# Lumni
+
+**Your AI agents act. Lumni makes sure each action happens once, the way you meant, and proves it did.**
+
+Lumni sits between agents and the things they change: refunds, emails, tickets, deploys. Before an action runs, it checks the action against what's true now and what other agents are doing, so duplicates, stale decisions and collisions are stopped. After it runs, Lumni verifies the result independently instead of trusting the tool call. The console shows what your agents did, where Lumni stepped in, and what that was worth.
+
+Source available and self-hostable ([FSL](LICENSE); the SDKs and CLI are Apache-2.0). New workspaces start in shadow mode: Lumni watches and reports before it enforces anything.
+
+## Get started
+
+**Use Lumni Cloud.** Sign up at [app.lumniverse.com](https://app.lumniverse.com), then in your agent's folder:
+
+```bash
+npx lumniverse init
+```
+
+It opens your browser to approve the connection, then writes the key and prints the lines to add where your agent acts.
+
+**See it work first.** Sample agents act out the twelve problems Lumni solves, in your workspace:
+
+```bash
+npx lumniverse try
+```
+
+**Just look around.** No account: `npx lumniverse demo`.
+
+**Run it yourself.** With Docker Compose; see the [self-hosting guide](docs/self-hosting.md):
+
+```bash
+git clone https://github.com/lumnihq/lumni.git && cd lumni/deploy
+cp .env.example .env    # fill in the four secrets
+docker compose up -d    # console on http://localhost:5200
+```
+
+## Let your coding agent do it
+
+Install the Lumni skill and ask your coding agent to "add Lumni to this agent":
+
+```bash
+npx skills add lumnihq/lumni                  # Claude Code, Cursor, Codex, and other agents
+```
+
+In Claude Code you can also run `/plugin marketplace add lumnihq/lumni`, then `/plugin install lumni@lumni`. For LLMs, the docs in one file: [lumniverse.com/llms.txt](https://lumniverse.com/llms.txt).
+
+## What's here
+
+| Folder | What it is |
+|---|---|
+| `cmd/`, `internal/` | The Go API (`lumnid`), worker, gateway and CLI |
+| `console/` | The console: plain HTML and JS pages, served by a small Bun server that also handles accounts |
+| `sdk/` | Go, TypeScript and Python SDKs |
+| `packages/lumni` | `npx lumniverse`: connect, try and demo |
+| `skills/` | The Lumni skill for coding agents (Claude Code, Cursor, Codex and others) |
+| `deploy/` | Docker Compose for self-hosting, and its Caddy config |
+| `examples/` | Example agents, including `agent-fleet`, a set of agents that make realistic mistakes |
+| `docs/` | Everything else |
+
+## Develop
+
+```bash
+docker compose up --build -d --wait     # API on :8080, console on :5200
+node scripts/try-workflow.mjs           # one complete workflow against it
+```
+
+For the console alone: `cd console && bun serve.ts` (see [console/README.md](console/README.md)). For the backend test suite without installing Go:
+
+```bash
+docker compose -f compose.test.yaml up --build --abort-on-container-exit --exit-code-from tests
+```
+
+[CONTRIBUTING.md](CONTRIBUTING.md) lists the checks to run before a change.
+
+## Documentation
+
+- [Getting started](docs/getting-started.md): one complete workflow, end to end.
+- [Self-hosting](docs/self-hosting.md): Docker Compose on your machine or a server, HTTPS, updates and backups.
+- [API](docs/api.md), [SDKs](docs/sdk.md), [integrations](docs/integrations.md) (MCP, OTLP, GitHub, webhooks).
+- [Configuration](docs/configuration.md), [operations](docs/operations.md), [testing](docs/testing.md).
+- [How coordination works](docs/coordination.md) and [durable execution](docs/durable-runtime.md).
+
+## Design constraints
+
+- Deterministic hard path: no LLM or vector store decides whether an action runs.
+- Tenant-scoped Postgres state and bounded transactions.
+- External runtimes (Temporal, Restate, LangGraph, OpenAI Agents) keep their own execution history.
+- Correctness depends on explicit effect identity and authoritative verification. Lumni doesn't guess identities from prose.
+
+## License
+
+Lumni's server and console are under the [Functional Source License](LICENSE) (FSL-1.1, Apache-2.0 future license): use it, change it and self-host it for your own agents; you can't offer it as a competing hosted service. Each release becomes Apache-2.0 two years after it ships. The SDKs (`sdk/`), the `lumniverse` CLI (`packages/lumni`), the skills (`skills/`) and the examples are Apache-2.0.
+
+Security reports: see [SECURITY.md](SECURITY.md).
+
+---
+
+<!-- source: https://github.com/lumnihq/lumni/blob/main/docs/getting-started.md -->
+
+# Run one complete workflow
+
+Lumni checks whether an agent should perform an action, records the call, and independently verifies its effect. Start with a local fixture before connecting a provider account.
+
+## 1. Start the service
+
+From the repository root, with Docker running:
+
+```sh
+docker compose up --build -d --wait
+```
+
+Open **http://localhost:5200** and create the owner account. The API is on http://localhost:8080; its development key is `lumni_local_change_me`, unless you set `LUMNI_BOOTSTRAP_ADMIN_KEY` in your environment or `.env`. The console's **Start** page explains the flow and connects your first agent. Development Compose ports bind to loopback.
+
+To run Lumni from published images instead of a checkout, see [self-hosting](self-hosting.md).
+
+If a port is occupied, for example:
+
+```sh
+LUMNI_HTTP_PORT=18089 LUMNI_POSTGRES_PORT=55439 \
+LUMNI_OTLP_HTTP_PORT=14318 LUMNI_OTLP_GRPC_PORT=14317 \
+  docker compose up --build -d --wait
+```
+
+Use the matching HTTP port in the following commands. Compose keeps PostgreSQL data across `docker compose stop` and subsequent starts. The first build needs network access for base images and dependencies.
+
+## 2. Run a real API workflow
+
+With Node 22+ installed:
+
+```sh
+node scripts/try-workflow.mjs
+```
+
+For a different service URL or key, supply `LUMNI_URL` and `LUMNI_API_KEY`. For a self-hosted install, the key is `LUMNI_ADMIN_KEY` in `deploy/.env`.
+
+This script uses the real backend and PostgreSQL, plus a separate local fixture payment ledger. It:
+
+1. Registers an example agent, work item, verifier and one operation-specific enforcement rule. It does not change your workspace's global mode.
+2. Admits and executes a simulated $100 refund, creating exactly one external ledger record.
+3. Demonstrates that a successful tool call is not automatically verified.
+4. Reads the ledger separately and records authenticated observer evidence.
+5. Submits a duplicate action and asserts that no second ledger mutation occurs.
+6. Prints links to the persistent task, findings and verified outcomes in your console.
+
+Expected ending: **PASS**, **External mutations: 1**, and independently verified outcomes. Every invocation has unique fixture IDs, so it can be run repeatedly. No real payment provider, model credential or agent framework is required. Example records remain in the selected workspace so you can inspect them. The script uses EVENT evidence; production refunds should use the authoritative Stripe verifier and correlation described in [durable runtime](durable-runtime.md).
+
+## 3. Run the recovery and correctness suite
+
+This command builds the test toolchain inside Docker and creates a separate PostgreSQL database. It needs no Go installation and publishes no host ports:
+
+```sh
+docker compose -f compose.test.yaml up --build \
+  --abort-on-container-exit --exit-code-from tests
+```
+
+It runs Go race, unit and Postgres integration tests, including the six scenarios, unknown-call recovery, native worker replay, verification and migration tests. The first compile can take several minutes. The command exits nonzero if a test fails. Its PostgreSQL data is temporary; it does not use your application database.
+
+To clean up the test containers:
+
+```sh
+docker compose -f compose.test.yaml down
+```
+
+Console and SDK suites are separate:
+
+```sh
+(cd console && bun test)
+npm ci --prefix sdk/typescript
+npm test --prefix sdk/typescript
+python3 -m venv .venv
+.venv/bin/python -m pip install pytest pytest-asyncio './sdk/python[langgraph,openai]'
+.venv/bin/python -m pytest sdk/python
+```
+
+Use Python 3.11+ for all framework tests. Restate-server and ClickHouse-profile tests need the environment described in their integration tests; CI configures those separately. [Release validation](release-validation.md) records which environments were actually tested.
+
+## Console development and the demo
+
+```sh
+cd console && bun serve.ts
+```
+
+Open `http://localhost:5200`. It signs in with the admin key in `console/.env` and switches between your workspace (`?data=real`) and a made-up day (`?data=mock`). `npx lumniverse demo` serves the demo alone, with no API. See [console/README.md](../console/README.md).
+
+## Connect a real workflow
+
+Start with one operation in a provider's test environment. Route existing MCP/HTTP tools through the gateway, or register a versioned Go/Python/TypeScript SDK worker. Keep Temporal, Restate, LangGraph or OpenAI Agents as the owner of orchestration when using an external-runtime adapter.
+
+In Setup, confirm the resource and effect identity, configure an authoritative verifier, and bind expected values to the operation. For a refund, include amount, currency and correlation with the provider's refund record. Observe traffic in shadow mode, then selectively enforce the operation after testing duplicate, delayed and timeout-after-write cases.
+
+Lumni can coordinate accurately identified effects. It does not infer reliable identities from arbitrary prose, guarantee correctness of uninstrumented calls, or prove absence from a temporary missing read-back. Unknown mutations remain held until evidence or a supported upstream idempotency contract makes retry safe. Review [OSS readiness](oss-readiness.md) before a production rollout.
+
+---
+
+<!-- source: https://github.com/lumnihq/lumni/blob/main/docs/sdk.md -->
+
+# SDKs and durable runtimes
+
+The Go package at [`sdk/go`](../sdk/go), TypeScript package at [`sdk/typescript`](../sdk/typescript), and Python package at [`sdk/python`](../sdk/python) implement the same lifecycle: work start/complete, observation, version update, check/start/heartbeat/result, approval polling, events, costs, and context propagation. Each client adds request IDs and bounds retries to transport-safe operations.
+
+Decision handling is explicit. Forward `ALLOW`, `WARN`, and every `WOULD_*` result. On `WAIT`, durably delay by `retry_after_ms`; on `REPLAN`, discard stale reasoning and read the resource again; on `REQUIRE_APPROVAL`, persist the approval ID and poll or resume from an approval event; on `DEDUPLICATE`, use only the referenced committed result metadata.
+
+Go uses `github.com/lumnihq/lumni/sdk/go` (`go get github.com/lumnihq/lumni/sdk/go`). TypeScript builds with `npm ci && npm test` from `sdk/typescript`. Python installs from `sdk/python` with `pip install -e .`. The examples under [`examples`](../examples) contain minimal agents in all three languages.
+
+The native Go CLI supports `lumni init --url <api-origin> --code <one-time-code> --dir <agent-project>` without Node. It detects SDK languages, configures credential files and MCP gateways, and records a hello check. See [backend onboarding and release packaging](onboarding.md); source SDKs are available locally, while public npm/PyPI publication remains a separate release operation.
+
+[`adapters/temporal`](../adapters/temporal) maps decisions to durable timers, application failures, and signals. [`adapters/restate`](../adapters/restate) maps them to durable suspension and retry instructions. These adapters return runtime-native instructions; they do not execute or own the user's workflow.
+
+# Console metadata conventions
+
+Agents can supply these fields through the existing SDK inputs. Use plain text for summaries and names; the console does not need extra endpoints for them.
+
+| Input | Field | Meaning |
+| --- | --- | --- |
+| Actor metadata | `team` | Team name used to group AIs |
+| Action metadata | `app` | App slug; otherwise the operation’s first segment is used |
+| Action metadata | `summary` | Plain-language description of the action |
+| Action metadata | `customer` | Customer name for approvals and journeys |
+| Action metadata | `amount` | Amount in dollars, used for displayed amounts and money kept from repeats |
+| Resource metadata | `name` | Human-readable resource name |
+
+When checking an action with an observed resource version, send `resources[].observed_at` as an RFC 3339 timestamp to preserve read age, including across rechecks. Otherwise the backend uses a matching work/resource/version observation when available. Resource-version updates optionally accept `actor_id`, `action_id`, `summary`, and `value_hash`; provide hashes instead of raw values. [Console API documentation](console-api.md) covers aggregate reads, paging, journeys, runtime controls, proofs, and notifications.
+
+---
+
+<!-- source: https://github.com/lumnihq/lumni/blob/main/sdk/typescript/README.md -->
+
+# @lumniverse/sdk
+
+The TypeScript client for [Lumni](https://lumniverse.com): your AI agents check with Lumni before they change anything, so each action happens once, the way you meant, and is proven afterwards.
+
+```bash
+npm install @lumniverse/sdk
+```
+
+The quickest start is `npx lumniverse init` in your agent's folder: it connects the agent, writes `LUMNI_URL` and `LUMNI_API_KEY` to `.env`, and prints the lines below for your code.
+
+```ts
+import { LumniClient, shouldExecute } from '@lumniverse/sdk';
+
+const lumni = new LumniClient(process.env.LUMNI_URL!, process.env.LUMNI_API_KEY!);
+
+const d = await lumni.checkAction({
+  actor_id: 'support-agent', work_id: runId, operation: 'stripe.refund',
+  arguments: { charge: chargeId, amount: 60 },
+  resources: [{ type: 'charge', external_id: chargeId, mode: 'WRITE' }],
+});
+if (shouldExecute(d)) await stripe.refunds.create({ charge: chargeId });
+```
+
+New workspaces start in shadow mode: Lumni records what it would have done, and `shouldExecute` lets everything through until you turn enforcement on.
+
+Adapters: `@lumniverse/sdk/langgraph` and `@lumniverse/sdk/openai` (OpenAI Agents). Node 22+.
+
+Docs: [github.com/lumnihq/lumni](https://github.com/lumnihq/lumni/blob/main/docs/sdk.md). License: Apache-2.0 (the SDK; Lumni’s server is FSL).
+
+---
+
+<!-- source: https://github.com/lumnihq/lumni/blob/main/sdk/python/README.md -->
+
+# lumni-sdk
+
+The Python client for [Lumni](https://lumniverse.com): your AI agents check with Lumni before they change anything, so each action happens once, the way you meant, and is proven afterwards.
+
+```bash
+pip install lumni-sdk
+```
+
+The quickest start is `npx lumniverse init` in your agent's folder: it connects the agent, writes `LUMNI_URL` and `LUMNI_API_KEY` to `.env`, and prints the lines below for your code.
+
+```python
+import os
+from lumni import Client, should_execute
+
+lumni = Client(os.environ["LUMNI_URL"], os.environ["LUMNI_API_KEY"])
+
+decision = lumni.check_action({
+    "actor_id": "support-agent", "work_id": run_id, "operation": "stripe.refund",
+    "arguments": {"charge": charge_id, "amount": 60},
+    "resources": [{"type": "charge", "external_id": charge_id, "mode": "WRITE"}],
+})
+if should_execute(decision):
+    stripe.Refund.create(charge=charge_id, amount=6000)
+```
+
+New workspaces start in shadow mode: Lumni records what it would have done, and `should_execute` lets everything through until you turn enforcement on.
+
+Extras: `pip install "lumni-sdk[langgraph]"` or `"lumni-sdk[openai]"` for the LangGraph and OpenAI Agents adapters. Python 3.10+.
+
+Docs: [github.com/lumnihq/lumni](https://github.com/lumnihq/lumni/blob/main/docs/sdk.md). License: Apache-2.0 (the SDK; Lumni’s server is FSL).
+
+---
+
+<!-- source: https://github.com/lumnihq/lumni/blob/main/docs/api.md -->
+
+# API contract
+
+[`api/openapi.yaml`](../api/openapi.yaml) is the canonical HTTP contract. Versioned event schemas live under [`api/schemas`](../api/schemas). Additive response fields are allowed; clients must ignore fields they do not understand.
+
+## Authentication and tenancy
+
+Every `/v1` endpoint except health and the signed GitHub receiver requires `Authorization: Bearer <key>`. Keys are random bearer credentials stored only as SHA-256 hashes, are bound to one tenant, and carry `admin`, `ingest`, `admission`, or `query` scopes. The raw value returned by `POST /v1/api-keys` is shown once. If `X-Lumni-Tenant` is sent, it must equal the key's tenant.
+
+The browser console sends the bearer key once to `POST /v1/auth/session`. The response sets `lumni_session` as an HttpOnly, SameSite cookie and returns a CSRF token. Cookie-authenticated `POST`, `PUT`, `PATCH`, and `DELETE` requests must include that token in `X-CSRF-Token`. Sessions idle after eight hours and have a 24-hour absolute lifetime by default. `DELETE /v1/auth/session` revokes the session.
+
+## Operational graph
+
+- `GET /v1/graph/snapshot` returns one focused graph for `live`, `agents`, `work`, `resources`, `transaction`, or `finops`. Filters include RFC3339 `from`/`to`, focus entity, depth, status, risk, and a hard limit of 500 nodes.
+- `GET /v1/graph/entities/{type}/{id}` returns an inspector with the current entity, immediate topology, redacted details, timeline, decision stages, and only the safe actions valid for its state.
+- `GET /v1/graph/stream` is a tenant-authenticated SSE invalidation stream. Resume with `Last-Event-ID`; a `reset` event means the client must fetch a complete snapshot.
+- `GET /v1/finops/graph` returns cost and waste series, provider/model/waste breakdowns, graph nodes, and an analytics freshness watermark.
+
+Graph responses expose `analytics.source`, `analytics.as_of`, `analytics.lag_seconds`, and fallback information. Graph invalidations never carry authoritative entity payloads; clients refetch a snapshot after an invalidation.
+
+Decision receipts include ordered `evaluations[]` for idempotency, exact effect, resource versions, conflicts, policy, and leases. This is additive to the existing decision and reason code.
+
+The only graph-specific mutation is `POST /v1/actions/{id}/cancel-reservation`, which succeeds only for an unstarted `RESERVED` action. It cannot release an active action.
+
+## Admission
+
+`POST /v1/actions/check` returns HTTP 200 for every valid coordination outcome. `ALLOW`, `WARN`, `WAIT`, `REPLAN`, `DEDUPLICATE`, `REQUIRE_APPROVAL`, and `REJECT` are application decisions, not transport errors. Shadow checks use the corresponding `WOULD_*` decision, set `enforced` to false, acquire no leases, and permit execution.
+
+An enforced `ALLOW` includes an opaque lease token and one monotonically increasing fencing token per write resource. The caller posts the lease token to `/start`, heartbeats while executing, and posts a terminal `/result`. A result advances resource versions and releases all leases in one transaction. `WAIT` exposes conflicting actions and retry guidance; `REPLAN` means the version source is comparable and stale; `DEDUPLICATE` references the committed effect; approval retries revalidate state before reserving.
+
+Callers may provide both `action_id` and `idempotency_key`. Reusing a key with a different canonical payload is deterministically rejected. Coordination snapshots record kernel, resolver, and policy versions; `GET /v1/replay/{actionID}` reruns only a registered historical kernel and otherwise returns an explicit unsupported-version error.
+
+Malformed input, authentication, authorization, and storage failures use the canonical envelope:
+
+```json
+{"error":{"code":"MALFORMED_JSON","message":"Request body is invalid","request_id":"req_...","details":{}}}
+```
+
+Events are idempotent on `(tenant_id,event_id)`. Resource identity is `(tenant,namespace,type,external_id)` and resolves to a stable opaque ID. Observations are historical evidence; authoritative versions are maintained separately and compared only when version sources match.
+
+---
+
+<!-- source: https://github.com/lumnihq/lumni/blob/main/docs/integrations.md -->
+
+# Integrations
+
+## Optional Composio connector
+
+The opt-in [Composio GitHub pilot](composio.md) supports account connection,
+status and disconnection, fresh PR reads, governed close/reopen actions, durable
+read-back verification and signed V3 event ingestion. Configure the API and
+worker with a scoped project key and your GitHub auth config. Direct integrations
+remain available. Live provider acceptance is required before production use.
+
+## MCP gateway
+
+The gateway supports subprocess stdio and Streamable HTTP on both sides. Unknown JSON-RPC methods and discovery payloads pass through byte-for-byte. `tools/call` is coordinated using `_meta.lumni` context first, then configured actor/session/work defaults. Missing identities are registered lazily.
+
+Shadow and warning decisions are forwarded and their upstream success or failure is reported. Enforced blocking decisions return a structured JSON-RPC response without calling the upstream tool. Coordinator outages fail open for low/medium risk and fail closed for high/critical risk unless `--fail-closed` makes the policy stricter.
+
+## OpenTelemetry
+
+`lumnid` accepts authenticated OTLP traces on gRPC `:4317` and HTTP `:4318/v1/traces` using protobuf or JSON. Send the Lumni API key as a bearer token. Spans deduplicate by tenant, trace ID, and span ID. `lumni.*` and applicable GenAI attributes correlate actors, sessions, work, actions, results, and cost outside the admission transaction.
+
+## Git and GitHub
+
+The GitHub receiver verifies `X-Hub-Signature-256` with constant-time HMAC comparison and deduplicates `X-GitHub-Delivery`. It upserts repositories, pull requests, commits, changed-file resources, and version relationships. Set `LUMNI_GITHUB_WEBHOOK_SECRET` and send the tenant slug as the documented receiver query parameter.
+
+`lumni repo-import --path .` records the repository, branch, commit, and blob identities without transmitting source contents by default. The worker owns asynchronous GitHub backfill hooks.
+
+## Outbound webhooks
+
+Admin endpoints under `/v1/webhooks` store encrypted endpoint secrets. Outbox delivery includes `X-Lumni-Delivery`, `X-Lumni-Event`, and `X-Lumni-Signature-256`, retries exponentially, and is at-least-once. Consumers must deduplicate delivery IDs.
+
+---
+
+<!-- source: https://github.com/lumnihq/lumni/blob/main/docs/self-hosting.md -->
+
+# Self-hosting Lumni
+
+Lumni Cloud ([app.lumniverse.com](https://app.lumniverse.com)) is the quickest way to use Lumni. To run it on your own infrastructure instead, use Docker Compose. Everything runs in four containers: the API (`lumnid`), its worker, the console, and Postgres.
+
+Self-hosting is free under the [Functional Source License](../LICENSE): you can run Lumni for your own agents, in your company, and change it. You can't offer it to others as a competing hosted service.
+
+## Requirements
+
+- Docker with Compose v2 (`docker compose version`)
+- 2 CPUs and 4 GB of memory for a small team; Postgres needs disk for your agents' history
+- To reach it from other machines: a server with ports 80 and 443 open, and a domain
+
+## 1. Get the files
+
+```bash
+git clone https://github.com/lumnihq/lumni.git
+cd lumni/deploy
+cp .env.example .env
+```
+
+## 2. Fill in the secrets
+
+Open `.env` and set the four secrets. Generate each with `openssl rand -hex 32`:
+
+```bash
+sed -i.bak \
+  -e "s/^LUMNI_ADMIN_KEY=$/LUMNI_ADMIN_KEY=lumni_$(openssl rand -hex 24)/" \
+  -e "s/^LUMNI_SECRET_ENCRYPTION_KEY=$/LUMNI_SECRET_ENCRYPTION_KEY=$(openssl rand -hex 32)/" \
+  -e "s/^LUMNI_CONSOLE_SECRET=$/LUMNI_CONSOLE_SECRET=$(openssl rand -hex 32)/" \
+  -e "s/^POSTGRES_PASSWORD=$/POSTGRES_PASSWORD=$(openssl rand -hex 24)/" \
+  .env && rm .env.bak
+```
+
+| Secret | What it protects |
+|---|---|
+| `LUMNI_ADMIN_KEY` | The first workspace's admin key; the console uses it to give each person their own scoped key |
+| `LUMNI_SECRET_ENCRYPTION_KEY` | Secrets the API stores (webhook and integration keys) |
+| `LUMNI_CONSOLE_SECRET` | Keys the console stores for its accounts |
+| `POSTGRES_PASSWORD` | The database |
+
+Keep `.env` private and backed up: without `LUMNI_SECRET_ENCRYPTION_KEY` and `LUMNI_CONSOLE_SECRET`, stored keys can't be read back.
+
+## 3. Start it
+
+```bash
+docker compose up -d
+docker compose ps        # lumnid and postgres should be healthy
+```
+
+Open http://localhost:5200. The first visit creates the owner account; invite everyone else from **Settings → People**.
+
+## 4. Connect an agent
+
+In the agent's folder:
+
+```bash
+npx lumniverse init --console http://localhost:5200
+```
+
+It opens your browser to approve, then writes `LUMNI_URL` and `LUMNI_API_KEY` to `.env` in that folder. To see Lumni at work first, `npx lumniverse try --console http://localhost:5200` runs sample agents in your workspace.
+
+## On a server, with a domain
+
+1. Point two DNS names at the server, for example `app.example.com` (the console) and `api.example.com` (the API), and open ports 80 and 443.
+2. In `.env`, use the "server with a domain" block: `COMPOSE_PROFILES=https`, the two URLs and the two hosts.
+3. `docker compose up -d`. Caddy gets and renews HTTPS certificates by itself.
+
+**Create the owner account straight away.** Until it exists, whoever opens the console first becomes the owner.
+
+Already running nginx or another proxy on 80/443? Leave `COMPOSE_PROFILES` empty, keep `LUMNI_BIND=127.0.0.1`, and proxy `app.` to `127.0.0.1:5200` and `api.` to `127.0.0.1:8080`. Turn off response buffering for both, since the console's live view streams.
+
+## Updating
+
+```bash
+git pull
+docker compose pull
+docker compose up -d
+```
+
+The API applies database migrations when it starts. Back up first (below). To stay on one version, set `LUMNI_VERSION` (for example `0.3.0`) instead of `latest`.
+
+## Backups
+
+```bash
+docker compose exec -T postgres pg_dump -U lumni -d lumni | gzip > lumni-$(date +%F).sql.gz
+docker compose exec -T console sh -c 'bun scripts/backup-db.ts /tmp/b.db && cat /tmp/b.db' > console-$(date +%F).db
+```
+
+The first is your agents' history and the workspace; the second is the console's accounts. Keep `.env` with them.
+
+## Optional settings
+
+All of these live in `.env`; apply changes with `docker compose up -d`.
+
+- **Sign in with Google or GitHub:** create an OAuth app with the callback `<LUMNI_APP_URL>/console/auth/oauth/google/callback` (or `.../github/callback`), then set the client ID and secret.
+- **Email alerts:** `LUMNI_SMTP_ADDR` (host:port, STARTTLS), `LUMNI_SMTP_FROM`, and a user and password.
+- **Slack:** through Composio, with `LUMNI_COMPOSIO_API_KEY` and `LUMNI_COMPOSIO_SLACK_AUTH_CONFIG_ID`.
+- **Analytics at large volume:** add `analytics` to `COMPOSE_PROFILES` (`https,analytics`), and set `LUMNI_ANALYTICS_BACKEND=clickhouse` and `CLICKHOUSE_PASSWORD`. Postgres stays the system of record.
+
+## Troubleshooting
+
+- `docker compose logs lumnid` (or `console`, `worker`, `postgres`) shows what each part is doing.
+- `curl http://localhost:8080/v1/health/ready` should answer `{"status":"ready"}`.
+- "required variable … is missing a value": a secret in `.env` is still empty.
+
+---
+
+<!-- source: https://github.com/lumnihq/lumni/blob/main/docs/configuration.md -->
+
+# Configuration and deterministic rules
+
+## Enforcement mode
+
+Each tenant has one of `SHADOW`, `WARN`, or `ENFORCE`. `SHADOW` and `WARN` persist `WOULD_*` receipts without leases or blocking. P1 execution controls are active only in `ENFORCE`.
+
+## Resource rules
+
+Resource rules map one `(source, tool)` pair to a canonical operation and bounded resource list. Arguments are selected only with RFC 6901 JSON Pointers. The format has no arbitrary expressions:
+
+```json
+{
+  "source": "mcp",
+  "tool": "refund_payment",
+  "operation": "payment.refund",
+  "resources": [
+    {"mode":"WRITE", "type":"payment", "id_pointer":"/payment_id"}
+  ]
+}
+```
+
+Explicit resources supplied by the SDK take precedence. Missing pointer targets produce `RESOURCE_UNRESOLVED`; semantic inference never enters enforcement.
+
+## Conflict rules
+
+Base write/write, write/delete, and same-identity create conflicts are deterministic. A conflict rule refines operation semantics for a resource type:
+
+```json
+{
+  "left_operation":"deployment.deploy",
+  "right_operation":"deployment.rollback",
+  "resource_type":"deployment",
+  "outcome":"WAIT",
+  "reason_code":"DOMAIN_OPERATION_CONFLICT"
+}
+```
+
+## Policy rules
+
+P1 policies match an operation, resource type, minimum risk, and optionally a numeric argument selected by JSON Pointer. Outcomes are `WARN`, `REQUIRE_APPROVAL`, or `REJECT`. There is no custom policy language.
+
+Approval creates no lease. An approved retry with the same idempotency identity rechecks current versions and conflicts before reservation.
+
+## Advisory semantic evaluation (JEV)
+
+Semantic evaluation is disabled by default and runs in a background loop that is separate from admission and durable-work maintenance. To make the OpenRouter adapter available to the worker, configure:
+
+```env
+LUMNI_SEMANTIC_PROVIDER=openrouter
+LUMNI_OPENROUTER_API_KEY=...
+LUMNI_JEV_MODEL=typesafe/jev-1.13
+LUMNI_SEMANTIC_TIMEOUT=5s
+LUMNI_SEMANTIC_MAX_RETRIES=3
+LUMNI_SEMANTIC_MAX_CANDIDATES=20
+```
+
+The worker checks `GET https://openrouter.ai/api/v1/endpoints/zdr` before sending any state and disables itself whenever the selected model is absent. Use an OpenRouter account or guardrail with `enforce_zdr_other=true` as an additional control. The adapter never opts into prompt logging or metadata capture and sends no plugins or tools. [OpenRouter's ZDR documentation](https://openrouter.ai/docs/guides/features/zdr) explains that ZDR prevents provider retention; it does not prevent the provider from receiving the minimized state.
+
+The pinned model is the production default; [`~typesafe/jev-latest`](https://openrouter.ai/~typesafe/jev-latest) is intended only for exploratory tests. OpenRouter currently routes JEV to one TypeSafe endpoint, so OpenRouter simplifies access and billing but is not provider redundancy.
+
+Availability at the worker level does not opt in a tenant. Enable a tenant explicitly with an admin key:
+
+```http
+PUT /v1/config/semantic
+Content-Type: application/json
+
+{"enabled":true}
+```
+
+Only goals, statuses, operation and tool names, resource types and modes, declared risk, reason codes, and bounded redacted summaries are sent. Raw arguments, resource identifiers, outputs, metadata, and error messages are excluded. Outbound state is never persisted. The evaluation audit row stores only its hash, typed answers, model IDs, usage, cost, latency, and failures.
+
+Accepted recommendations appear as ordinary findings and, for duplicate or supersession suggestions, `work_edges` with `evidence_type=SEMANTIC_INFERENCE`. They are advisory and never modify work, risk, approvals, verification, leases, or admission decisions.
+
+Audit records are available from `GET /v1/semantic-evaluations` and can be filtered by `work_id`. They contain no outbound state.
+
+Rollout should progress from fixture replay to internal shadow traffic and then tenant opt-in. Before broader use, evaluate at least 200 labeled examples per capability and require 90% precision for duplicate/supersession, 85% precision for risk/trace findings, binary expected-calibration error at most 0.10, no admission-latency regression, and no non-allowlisted outbound fields.
