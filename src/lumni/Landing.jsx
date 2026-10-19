@@ -3,6 +3,7 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { ArrowRight, Check, Copy, Eye, Github, Play, Plus, ShieldCheck, Terminal, X } from 'lucide-react';
 import { AgentTimeline, STEPS } from './AgentTimeline';
 import { Catalog, Features } from './Catalog';
+import { SkillCommand, SkillInstall } from './SkillInstall';
 import {
   GITHUB_URL, NPM_URL, PRIVACY_URL, SELF_HOST_URL, SIGNIN_URL, SIGNUP_URL, TERMS_URL, TRY_COMMAND,
 } from '../lib/links';
@@ -24,6 +25,7 @@ export function Landing() {
         <Why />
         <Catches />
         <How />
+        <Skill />
         <Console />
         <Pricing />
         <Faq />
@@ -267,6 +269,41 @@ function How() {
           <div className="px-5 sm:px-6 py-3 border-t border-white/10 text-xs text-white/50">
             TypeScript · Python · Go · LangGraph, OpenAI Agents, Temporal and MCP adapters · Apache-2.0
           </div>
+        </motion.div>
+      </div>
+    </section>
+  );
+}
+
+/* ---------- skill ---------- */
+
+function Skill() {
+  const agents = ['Claude Code', 'Cursor', 'Codex', 'GitHub Copilot', 'Gemini CLI', 'Amp', 'Cline', 'OpenCode', 'Zed', 'Warp'];
+  return (
+    <section id="skill" className="py-20 sm:py-28 px-5 sm:px-6 scroll-mt-16 border-t border-lm-line">
+      <div className="max-w-6xl mx-auto grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
+        <motion.div {...rise()}>
+          <div className="text-sm font-semibold text-lm-accent mb-3">Or let your coding agent do it</div>
+          <h2 className="text-[34px] sm:text-[44px] font-semibold tracking-[-0.035em] leading-[1.08]">
+            One command teaches your coding agent Lumni.
+          </h2>
+          <p className="mt-4 text-lg text-lm-ink2 leading-relaxed">
+            Install the Lumni skill, then ask: “add Lumni to the refund step”. It knows which calls to wrap, how to name the effect so it happens once, and how to handle every decision.
+          </p>
+          <div className="mt-7">
+            <SkillCommand />
+          </div>
+          <div className="mt-6 flex flex-wrap gap-2">
+            {agents.map((a) => (
+              <span key={a} className="rounded-full border border-lm-line bg-white px-3 py-1 text-sm text-lm-ink2">{a}</span>
+            ))}
+          </div>
+          <p className="mt-5 text-sm text-lm-ink3">
+            Claude Code: <code className="font-mono text-lm-ink2">/plugin marketplace add lumnihq/lumni</code>. For LLMs: <a href="/llms.txt" className="underline underline-offset-2 hover:text-lm-ink">llms.txt</a>
+          </p>
+        </motion.div>
+        <motion.div {...rise(1)}>
+          <SkillInstall />
         </motion.div>
       </div>
     </section>
