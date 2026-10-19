@@ -500,7 +500,7 @@ function End() {
         </h2>
         <p className="mt-5 text-lg text-lm-ink2">See it catch real mistakes in a minute with sample agents. Then connect yours. No card.</p>
         <div className="mt-9 flex flex-col sm:flex-row items-center justify-center gap-3">
-          <Primary>Start free for 14 days <ArrowRight className="w-4 h-4" /></Primary>
+          <Primary>Start free <ArrowRight className="w-4 h-4" /></Primary>
           <CopyCommand command={TRY_COMMAND} />
         </div>
       </motion.div>
