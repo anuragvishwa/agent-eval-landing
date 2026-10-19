@@ -5,7 +5,7 @@
 Key facts:
 
 - Cloud: https://app.lumniverse.com (14-day trial, then $49/month with 50,000 checks, $3 per extra 1,000). Self-host with Docker Compose. Server and console are FSL-1.1 (Apache-2.0 after two years); SDKs, CLI, skills and examples are Apache-2.0.
-- Connect an agent: `npx lumniverse init` in its folder (writes `LUMNI_URL` and `LUMNI_API_KEY`). Try sample agents: `npx lumniverse try`. Look around with no account: `npx lumniverse demo`.
+- See it work: `npx lumniverse try` runs sample agents that make real mistakes in your workspace while Lumni catches them (it creates an account if needed). Connect a real agent: `npx lumniverse init` in its folder (writes `LUMNI_URL` and `LUMNI_API_KEY`).
 - SDKs: TypeScript `@lumniverse/sdk` (Node 22+), Python `lumni-sdk` (3.10+), Go `github.com/lumnihq/lumni/sdk/go`. Adapters for LangGraph, OpenAI Agents, Temporal, Restate, and an MCP gateway.
 - Core call: `checkAction({ actor_id, work_id, operation, effect_key, resources, arguments, metadata })`, then act only if `shouldExecute(decision)`, then `startAction` and `reportResult`.
 - `effect_key` names the real-world effect (e.g. `refund:<order id>`): the same key means the same effect, which happens once.
@@ -171,21 +171,21 @@ Source available and self-hostable ([FSL](LICENSE); the SDKs and CLI are Apache-
 
 ## Get started
 
-**Use Lumni Cloud.** Sign up at [app.lumniverse.com](https://app.lumniverse.com), then in your agent's folder:
-
-```bash
-npx lumniverse init
-```
-
-It opens your browser to approve the connection, then writes the key and prints the lines to add where your agent acts.
-
-**See it work first.** Sample agents act out the twelve problems Lumni solves, in your workspace:
+**1. See it work.** Sample agents make the twelve classic mistakes (double refunds, stale writes, agents overwriting people) in your own workspace, and you watch Lumni catch them live:
 
 ```bash
 npx lumniverse try
 ```
 
-**Just look around.** No account: `npx lumniverse demo`.
+It opens your browser; if you don't have an account yet, you create one there (14 days free, no card).
+
+**2. Connect your real agent.** In your agent's folder:
+
+```bash
+npx lumniverse init
+```
+
+It writes `LUMNI_URL` and `LUMNI_API_KEY` to `.env` and prints the lines to add where your agent acts. Or let your coding agent wire it in (next section).
 
 **Run it yourself.** With Docker Compose; see the [self-hosting guide](docs/self-hosting.md):
 
@@ -341,7 +341,7 @@ Use Python 3.11+ for all framework tests. Restate-server and ClickHouse-profile 
 cd console && bun serve.ts
 ```
 
-Open `http://localhost:5200`. It signs in with the admin key in `console/.env` and switches between your workspace (`?data=real`) and a made-up day (`?data=mock`). `npx lumniverse demo` serves the demo alone, with no API. See [console/README.md](../console/README.md).
+Open `http://localhost:5200`. It signs in with the admin key in `console/.env` and switches between your workspace (`?data=real`) and a made-up day (`?data=mock`). See [console/README.md](../console/README.md).
 
 ## Connect a real workflow
 

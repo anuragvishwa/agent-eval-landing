@@ -150,6 +150,9 @@ function Hero({ onFilm }) {
             <Primary>Start free <ArrowRight className="w-4 h-4" /></Primary>
             <CopyCommand command={TRY_COMMAND} />
           </motion.div>
+          <motion.p {...intro(0.2)} className="mt-3 text-sm text-lm-ink3">
+            <code className="font-mono text-lm-ink2">try</code> runs sample agents in your own workspace, so you see Lumni catch real mistakes. Then <code className="font-mono text-lm-ink2">npx lumniverse init</code> connects your agent.
+          </motion.p>
 
           <motion.ol {...intro(0.25)} className="hidden lg:block mt-10 space-y-1">
             {STEPS.map((s, i) => (
@@ -235,15 +238,15 @@ function Catches() {
 
 function How() {
   const steps = [
-    [Terminal, 'Connect', <code key="c" className="font-mono text-[13px]"><span className="text-lm-ink3">$</span> npx lumniverse init</code>],
-    [Eye, 'Watch', 'Lumni only watches at first: you see what it would have stopped, and nothing is blocked.'],
+    [Eye, 'See it work', <>Sample agents make real mistakes in your workspace while Lumni catches them. <code className="block mt-1 font-mono text-[13px] text-lm-ink"><span className="text-lm-ink3">$</span> npx lumniverse try</code></>],
+    [Terminal, 'Connect your agent', <>In your agent’s folder. It starts by only watching: nothing is blocked. <code className="block mt-1 font-mono text-[13px] text-lm-ink"><span className="text-lm-ink3">$</span> npx lumniverse init</code></>],
     [ShieldCheck, 'Protect', 'Turn it on, per action, when the record shows it only stops real problems.'],
   ];
   return (
     <section id="how" className="py-20 sm:py-28 px-5 sm:px-6 scroll-mt-16">
       <div className="max-w-6xl mx-auto grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
         <div>
-          <Heading kicker="How it works" title="One check before the actions that matter." lead="No new framework and no rewrite. Wrap the calls that change things: refunds, emails, CRM writes. Leave the rest alone." />
+          <Heading kicker="How it works" title="See it work, then connect your agent." lead="No new framework and no rewrite. Wrap the calls that change things: refunds, emails, CRM writes. Leave the rest alone." />
           <div className="-mt-4 space-y-3">
             {steps.map(([Icon, t, d], i) => (
               <motion.div key={t} {...rise(i)} className="flex items-center gap-4 rounded-2xl bg-[#f7f7f8] px-4 py-4">
@@ -386,7 +389,7 @@ function Console() {
           </div>
         </motion.div>
         <p className="text-center text-sm text-lm-ink3 mt-6">
-          See it on a sample day, no account: <code className="font-mono text-lm-ink2">npx lumniverse demo</code>
+          Watch your own console fill up: <code className="font-mono text-lm-ink2">npx lumniverse try</code>
         </p>
       </div>
     </section>
@@ -495,7 +498,7 @@ function End() {
         <h2 className="text-[40px] sm:text-[60px] font-semibold tracking-[-0.045em] leading-[1.02]">
           Give your agents a shared sense of reality.
         </h2>
-        <p className="mt-5 text-lg text-lm-ink2">Try it on sample agents in a minute. No card.</p>
+        <p className="mt-5 text-lg text-lm-ink2">See it catch real mistakes in a minute with sample agents. Then connect yours. No card.</p>
         <div className="mt-9 flex flex-col sm:flex-row items-center justify-center gap-3">
           <Primary>Start free for 14 days <ArrowRight className="w-4 h-4" /></Primary>
           <CopyCommand command={TRY_COMMAND} />
