@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
-import { ArrowRight, Check, Copy, Eye, Github, Play, Plus, ShieldCheck, Terminal, X } from 'lucide-react';
+import { ArrowRight, Check, Copy, Eye, Github, Play, Plus, ShieldCheck, Terminal } from 'lucide-react';
 import { AgentTimeline, STEPS } from './AgentTimeline';
 import { Catalog, Features } from './Catalog';
 import { SkillCommand, SkillInstall } from './SkillInstall';
@@ -16,23 +16,30 @@ const rise = (i = 0) => ({
 });
 
 export function Landing() {
-  const [film, setFilm] = useState(false);
+  const film = useRef(null);
+  // The hero's "watch the film" scrolls to it and plays it.
+  const playFilm = () => {
+    const v = film.current;
+    if (!v) return;
+    v.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    v.play().catch(() => {});
+  };
   return (
     <div className="min-h-screen bg-lm-paper text-lm-ink font-display antialiased selection:bg-lm-soft">
       <Nav />
       <main>
-        <Hero onFilm={() => setFilm(true)} />
+        <Hero onFilm={playFilm} />
+        <Film videoRef={film} />
+        <Skill />
         <Why />
         <Catches />
         <How />
-        <Skill />
         <Console />
         <Pricing />
         <Faq />
         <End />
       </main>
       <Footer />
-      <FilmModal open={film} onClose={() => setFilm(false)} />
     </div>
   );
 }
@@ -275,6 +282,29 @@ function How() {
   );
 }
 
+/* ---------- film ---------- */
+
+function Film({ videoRef }) {
+  return (
+    <section id="film" className="bg-[#f7f7f8] pb-16 sm:pb-24 px-5 sm:px-6 scroll-mt-16">
+      <motion.div {...rise()} className="max-w-5xl mx-auto">
+        <div className="rounded-[20px] border border-[#ececf0] bg-white p-2 shadow-[0_30px_80px_-40px_rgba(40,30,120,0.35)]">
+          <video
+            ref={videoRef}
+            className="w-full rounded-[14px] aspect-video bg-lm-ink"
+            src="/lumni/lumni-film.mp4"
+            poster="/lumni/film-poster.webp"
+            controls
+            playsInline
+            preload="metadata"
+          />
+        </div>
+        <p className="mt-4 text-center text-sm text-lm-ink3">Lumni in 40 seconds: the problems, the console, and how to try it.</p>
+      </motion.div>
+    </section>
+  );
+}
+
 /* ---------- skill ---------- */
 
 function Skill() {
@@ -493,32 +523,5 @@ function Footer() {
         </div>
       </div>
     </footer>
-  );
-}
-
-/* ---------- film ---------- */
-
-function FilmModal({ open, onClose }) {
-  useEffect(() => {
-    if (!open) return undefined;
-    const onKey = (e) => e.key === 'Escape' && onClose();
-    window.addEventListener('keydown', onKey);
-    return () => window.removeEventListener('keydown', onKey);
-  }, [open, onClose]);
-  return (
-    <AnimatePresence>
-      {open && (
-        <motion.div
-          initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-          className="fixed inset-0 z-[100] bg-lm-ink/70 backdrop-blur-sm flex items-center justify-center p-4"
-          onClick={onClose}
-        >
-          <motion.div initial={{ scale: 0.96 }} animate={{ scale: 1 }} exit={{ scale: 0.96 }} className="relative w-full max-w-5xl" onClick={(e) => e.stopPropagation()}>
-            <button type="button" onClick={onClose} aria-label="Close" className="absolute -top-11 right-0 p-2 text-white/80 hover:text-white"><X className="w-6 h-6" /></button>
-            <video className="w-full rounded-2xl bg-black aspect-video shadow-2xl" src="/lumni/lumni-film.mp4" poster="/lumni/film-poster.webp" controls autoPlay playsInline />
-          </motion.div>
-        </motion.div>
-      )}
-    </AnimatePresence>
   );
 }
