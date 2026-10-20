@@ -474,7 +474,7 @@ const plans = [
   {
     name: 'Team',
     tagline: 'Let Lumni step in.',
-    price: '$49', per: '/mo',
+    price: '$99', per: '/mo', badge: 'Launch price, locked in',
     usage: '50,000 checks/mo included · + $3 per 1,000 after',
     cta: 'Start 14-day free trial', href: SIGNUP_URL, featured: true,
     lead: 'Everything in Free, plus',
@@ -507,9 +507,10 @@ function Pricing() {
             {p.featured && <span className="absolute -top-3 left-7 rounded-full bg-lm-accent px-3 py-1 text-xs font-semibold text-white">Most teams</span>}
             <h3 className="text-lg font-semibold">{p.name}</h3>
             <p className="mt-1 text-[15px] text-lm-ink2">{p.tagline}</p>
-            <div className="mt-6 flex items-baseline gap-1">
+            <div className="mt-6 flex flex-wrap items-baseline gap-x-2 gap-y-1">
               <span className="text-[44px] font-semibold tracking-[-0.03em] leading-none">{p.price}</span>
               {p.per && <span className="text-lm-ink2">{p.per}</span>}
+              {p.badge && <span className="ml-1 self-center rounded-full bg-lm-pop/70 px-2.5 py-0.5 text-[11.5px] font-semibold text-lm-ink">{p.badge}</span>}
             </div>
             <p className="mt-2 font-mono text-[12.5px] text-lm-ink2 min-h-[38px]">{p.usage}</p>
             <a
@@ -541,7 +542,7 @@ function Pricing() {
       </div>
       <div className="mt-10 max-w-3xl mx-auto text-center space-y-2 text-sm text-lm-ink2">
         <p><b className="text-lm-ink">One check</b> is one action an agent asks Lumni about before doing it: a refund, an email, a CRM write. Reads, dashboards and people using the console are free.</p>
-        <p>Every account starts with 14 days of Team. Running it yourself? <a href={SELF_HOST_URL} target="_blank" rel="noopener noreferrer" className="text-lm-accent underline underline-offset-2">Self-hosting is free</a>. Need a custom deployment? <a href="mailto:privacy@lumniverse.com?subject=Lumni%20Enterprise" className="text-lm-accent underline underline-offset-2">Get in touch</a>.</p>
+        <p>Every account starts with 14 days of Team. Teams that subscribe now keep the launch price for as long as they stay. Running it yourself? <a href={SELF_HOST_URL} target="_blank" rel="noopener noreferrer" className="text-lm-accent underline underline-offset-2">Self-hosting is free</a>. Need a custom deployment? <a href="mailto:privacy@lumniverse.com?subject=Lumni%20Enterprise" className="text-lm-accent underline underline-offset-2">Get in touch</a>.</p>
       </div>
     </Section>
   );
