@@ -461,53 +461,88 @@ function OpenSource() {
 /* ---------- pricing ---------- */
 
 const plans = [
-  { name: 'Trial', price: '$0', unit: 'for 14 days', note: 'No card needed.', items: ['2,000 checks a day', 'Every feature', 'Invite your team'], cta: 'Start the trial', href: SIGNUP_URL },
-  { name: 'Team', price: '$49', unit: '/ month', note: '50,000 checks included, then $3 per 1,000.', items: ['Unlimited people and agents', 'Lumni steps in for real', 'Approvals and alerts', 'Cancel anytime'], cta: 'Start free, then subscribe', href: SIGNUP_URL, featured: true },
-  { name: 'Self-hosted', price: 'Free', unit: 'on your servers', note: 'Source available (FSL).', items: ['Docker Compose', 'Your data stays with you', 'Support on request'], cta: 'Read the guide', href: SELF_HOST_URL, external: true },
+  {
+    name: 'Free',
+    tagline: 'See what your agents would get wrong.',
+    price: '$0', per: '/mo',
+    usage: '500 checks a day, forever',
+    cta: 'Get started free', href: SIGNUP_URL,
+    lead: 'Includes',
+    features: ['Every action checked and recorded', 'Today, Flow and the whole console', 'SDKs, MCP gateway and the Lumni skill', 'Invite your team'],
+    limits: ['Watch only: shows what it would stop, never blocks', '500 checks a day'],
+  },
+  {
+    name: 'Team',
+    tagline: 'Let Lumni step in.',
+    price: '$49', per: '/mo',
+    usage: '50,000 checks/mo included · + $3 per 1,000 after',
+    cta: 'Start 14-day free trial', href: SIGNUP_URL, featured: true,
+    lead: 'Everything in Free, plus',
+    features: ['Protect: stops repeats, stale writes and collisions', 'Approvals for risky actions', 'Proof: results read back from the app', 'Slack and email alerts, daily spend limits'],
+    limits: ['Unlimited people and agents', 'Cancel anytime'],
+  },
+  {
+    name: 'Enterprise',
+    tagline: 'Your servers, your terms.',
+    price: 'Custom', per: '',
+    usage: 'Volume pricing for large fleets',
+    cta: 'Talk to us', href: 'mailto:privacy@lumniverse.com?subject=Lumni%20Enterprise',
+    lead: 'Everything in Team, plus',
+    features: ['Self-host on your infrastructure', 'Custom limits and terms', 'Priority support and onboarding', 'Help with your security review'],
+    limits: ['Your data never leaves (self-hosted)', 'Higher limits to fit your fleet'],
+  },
 ];
 
 function Pricing() {
   return (
     <Section id="pricing">
-      <Heading center kicker="Pricing" title="Free to start. One price to grow." lead="You pay for checks: one action an agent asks Lumni about. Reads, dashboards and people are free." />
-      <div className="grid md:grid-cols-3 gap-4 items-stretch max-w-5xl mx-auto">
+      <Heading center kicker="Pricing" title="Get started for free." lead="No credit card required. Upgrade when you want Lumni to step in." />
+      <div className="grid md:grid-cols-3 gap-4 items-stretch">
         {plans.map((p, i) => (
           <motion.div
             key={p.name}
             {...rise(i)}
-            className={`flex flex-col rounded-3xl p-7 ${p.featured ? 'bg-lm-ink text-white shadow-2xl md:-my-3' : 'bg-white ring-1 ring-lm-line'}`}
+            className={`relative flex flex-col rounded-3xl p-7 bg-white ${p.featured ? 'ring-2 ring-lm-accent shadow-[0_30px_70px_-35px_rgba(91,75,245,.55)]' : 'ring-1 ring-lm-line'}`}
           >
-            <div className="flex items-center justify-between">
-              <h3 className="text-lg font-semibold">{p.name}</h3>
-              {p.featured && <span className="rounded-full bg-lm-pop px-2.5 py-0.5 text-xs font-semibold text-lm-ink">Most teams</span>}
+            {p.featured && <span className="absolute -top-3 left-7 rounded-full bg-lm-accent px-3 py-1 text-xs font-semibold text-white">Most teams</span>}
+            <h3 className="text-lg font-semibold">{p.name}</h3>
+            <p className="mt-1 text-[15px] text-lm-ink2">{p.tagline}</p>
+            <div className="mt-6 flex items-baseline gap-1">
+              <span className="text-[44px] font-semibold tracking-[-0.03em] leading-none">{p.price}</span>
+              {p.per && <span className="text-lm-ink2">{p.per}</span>}
             </div>
-            <div className="mt-5 flex items-baseline gap-1.5">
-              <span className="text-5xl font-semibold tracking-tight">{p.price}</span>
-              <span className={p.featured ? 'text-white/60' : 'text-lm-ink2'}>{p.unit}</span>
-            </div>
-            <p className={`mt-2 text-sm ${p.featured ? 'text-white/70' : 'text-lm-ink2'}`}>{p.note}</p>
-            <ul className="mt-6 space-y-3 flex-1">
-              {p.items.map((it) => (
-                <li key={it} className="flex items-center gap-2.5 text-[15px]">
-                  <Check className={`w-4 h-4 shrink-0 ${p.featured ? 'text-lm-pop' : 'text-lm-accent'}`} /> {it}
-                </li>
-              ))}
-            </ul>
+            <p className="mt-2 font-mono text-[12.5px] text-lm-ink2 min-h-[38px]">{p.usage}</p>
             <a
               href={p.href}
-              {...(p.external ? { target: '_blank', rel: 'noopener noreferrer' } : {})}
-              className={`mt-8 rounded-full px-4 py-3 text-center text-[15px] font-medium transition-colors ${
-                p.featured ? 'bg-white text-lm-ink hover:bg-lm-pop' : 'ring-1 ring-lm-line2 hover:bg-lm-wash'
-              }`}
+              className={`mt-5 rounded-full px-4 py-3 text-center text-[15px] font-medium transition-colors ${p.featured ? 'bg-lm-accent text-white hover:bg-[#4c3de0]' : 'bg-lm-ink text-white hover:bg-black'}`}
             >
               {p.cta}
             </a>
+            <div className="mt-7 border-t border-lm-line pt-6 flex-1">
+              <div className="text-xs font-semibold uppercase tracking-[0.08em] text-lm-ink3">{p.lead}</div>
+              <ul className="mt-3 space-y-2.5">
+                {p.features.map((f) => (
+                  <li key={f} className="flex items-start gap-2.5 text-[14.5px] leading-snug">
+                    <Check className="w-4 h-4 mt-0.5 shrink-0 text-lm-accent" /> {f}
+                  </li>
+                ))}
+              </ul>
+              <div className="mt-6 text-xs font-semibold uppercase tracking-[0.08em] text-lm-ink3">Limits</div>
+              <ul className="mt-3 space-y-2.5">
+                {p.limits.map((f) => (
+                  <li key={f} className="flex items-start gap-2.5 text-[14.5px] leading-snug text-lm-ink2">
+                    <span className="mt-[7px] w-1.5 h-1.5 shrink-0 rounded-full bg-lm-line2" /> {f}
+                  </li>
+                ))}
+              </ul>
+            </div>
           </motion.div>
         ))}
       </div>
-      <p className="text-center text-sm text-lm-ink3 mt-10">
-        After the trial without a plan, Lumni keeps watching (500 checks a day) but stops stepping in. Your agents keep running either way.
-      </p>
+      <div className="mt-10 max-w-3xl mx-auto text-center space-y-2 text-sm text-lm-ink2">
+        <p><b className="text-lm-ink">One check</b> is one action an agent asks Lumni about before doing it: a refund, an email, a CRM write. Reads, dashboards and people using the console are free.</p>
+        <p>Every account starts with 14 days of Team. Running it yourself? <a href={SELF_HOST_URL} target="_blank" rel="noopener noreferrer" className="text-lm-accent underline underline-offset-2">Self-hosting is free</a>. Need a custom deployment? <a href="mailto:privacy@lumniverse.com?subject=Lumni%20Enterprise" className="text-lm-accent underline underline-offset-2">Get in touch</a>.</p>
+      </div>
     </Section>
   );
 }
