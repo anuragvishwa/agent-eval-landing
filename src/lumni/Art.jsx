@@ -65,7 +65,7 @@ export function Shot({ src, alt, scene, ratio = 'aspect-[16/11]' }) {
   return (
     <Art scene={scene} className="p-5 sm:p-8">
       <div className={`relative ${ratio} rounded-[14px] overflow-hidden bg-white shadow-[0_30px_70px_-30px_rgba(30,20,60,.45)] ring-1 ring-black/5`}>
-        <img src={src} alt={alt} loading="lazy" className="absolute inset-0 w-full h-full object-cover object-top" />
+        <img src={src} alt={alt} loading="lazy" className="absolute inset-0 w-full h-full object-cover object-top cursor-zoom-in" />
       </div>
     </Art>
   );

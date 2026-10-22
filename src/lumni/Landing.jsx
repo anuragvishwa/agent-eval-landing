@@ -1,9 +1,11 @@
 import { useEffect, useRef, useState } from 'react';
 import { motion } from 'framer-motion';
-import { ArrowRight, Check, Copy, Github, Play } from 'lucide-react';
+import { ArrowRight, Check, Copy, Github } from 'lucide-react';
 import { AgentTimeline, STEPS } from './AgentTimeline';
 import { Art, Shot } from './Art';
 import { Catalog } from './Catalog';
+import { LiveDemo } from './LiveDemo';
+import { Zoom } from './Zoom';
 import { SkillCommand, SkillInstall } from './SkillInstall';
 import {
   GITHUB_URL, NPM_URL, PRIVACY_URL, SELF_HOST_URL, SIGNIN_URL, SIGNUP_URL, TERMS_URL, TRY_COMMAND,
@@ -17,20 +19,14 @@ const rise = (i = 0) => ({
 });
 
 export function Landing() {
-  const film = useRef(null);
-  // The hero's "watch the film" scrolls to it and plays it.
-  const playFilm = () => {
-    const v = film.current;
-    if (!v) return;
-    v.scrollIntoView({ behavior: 'smooth', block: 'center' });
-    v.play().catch(() => {});
-  };
+  // The hero's "try the live demo" scrolls down to it.
+  const toDemo = () => document.getElementById('demo')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
   return (
     <div className="min-h-screen bg-[#fbfaf7] text-lm-ink font-display antialiased selection:bg-lm-soft">
       <Nav />
       <main>
-        <Hero onFilm={playFilm} />
-        <Intro videoRef={film} />
+        <Hero onDemo={toDemo} />
+        <LiveDemo />
         <GetStarted />
         <Features />
         <Problems />
@@ -41,6 +37,7 @@ export function Landing() {
         <End />
       </main>
       <Footer />
+      <Zoom />
     </div>
   );
 }
@@ -114,6 +111,7 @@ function Nav() {
       <div className="max-w-6xl mx-auto px-5 sm:px-6 h-16 flex items-center justify-between">
         <Logo />
         <div className="hidden md:flex items-center gap-7 text-[15px] text-lm-ink2">
+          <a href="#demo" className="hover:text-lm-ink">Live demo</a>
           <a href="#product" className="hover:text-lm-ink">Product</a>
           <a href="#skill" className="hover:text-lm-ink">Skill</a>
           <a href="#open-source" className="hover:text-lm-ink">Open source</a>
@@ -132,7 +130,7 @@ function Nav() {
 
 /* ---------- hero ---------- */
 
-function Hero({ onFilm }) {
+function Hero({ onDemo }) {
   const [step, setStep] = useState(0);
   const seek = useRef(null);
   const intro = (d) => ({ initial: { opacity: 0, y: 12 }, animate: { opacity: 1, y: 0 }, transition: { duration: 0.6, delay: d, ease: [0.22, 1, 0.36, 1] } });
@@ -142,12 +140,12 @@ function Hero({ onFilm }) {
         <div>
           <motion.button
             type="button"
-            onClick={onFilm}
+            onClick={onDemo}
             {...intro(0)}
             className="inline-flex items-center gap-2 rounded-full border border-lm-line bg-white pl-1.5 pr-3.5 py-1.5 text-sm text-lm-ink2 hover:text-lm-ink mb-6"
           >
             <span className="rounded-full bg-lm-pop px-2 py-0.5 text-xs font-semibold text-lm-ink">Live</span>
-            Watch the 40s film <Play className="w-3 h-3 fill-current" />
+            Try the live demo <ArrowRight className="w-3 h-3" />
           </motion.button>
           <motion.h1 {...intro(0.05)} className="text-[42px] sm:text-[56px] font-semibold tracking-[-0.045em] leading-[1.02]">
             AI agents that don’t step on each other.
@@ -189,33 +187,6 @@ function Hero({ onFilm }) {
         </motion.div>
       </div>
     </section>
-  );
-}
-
-/* ---------- intro + film ---------- */
-
-function Intro({ videoRef }) {
-  return (
-    <Section id="film" className="pt-6 sm:pt-10">
-      <Heading
-        center
-        title="Everything your agents do, in one calm place."
-        lead="Lumni sits between your agents and the apps they change. It checks each action before it runs and proves it after, so a hundred agents behave like one careful team."
-      />
-      <motion.div {...rise(1)}>
-        <Art scene="cloud" className="p-3 sm:p-8 max-w-5xl mx-auto">
-          <video
-            ref={videoRef}
-            className="w-full rounded-[14px] aspect-video bg-lm-ink shadow-[0_30px_70px_-30px_rgba(30,20,60,.45)]"
-            src="/lumni/lumni-film.mp4"
-            poster="/lumni/film-poster.webp"
-            controls
-            playsInline
-            preload="metadata"
-          />
-        </Art>
-      </motion.div>
-    </Section>
   );
 }
 
@@ -606,7 +577,7 @@ function End() {
 
 function Footer() {
   const cols = [
-    ['Product', [['The product', '#product'], ['Pricing', '#pricing'], ['The film', '#film'], ['Log in', SIGNIN_URL]]],
+    ['Product', [['The product', '#product'], ['Pricing', '#pricing'], ['Live demo', '#demo'], ['Log in', SIGNIN_URL]]],
     ['Open source', [['GitHub', GITHUB_URL], ['Self-hosting', SELF_HOST_URL], ['License (FSL)', `${GITHUB_URL}/blob/main/LICENSE`]]],
     ['Developers', [['The Lumni skill', '#skill'], ['llms.txt', '/llms.txt'], ['npm: lumniverse', NPM_URL], ['SDKs', `${GITHUB_URL}/blob/main/docs/sdk.md`]]],
     ['Company', [['Privacy', PRIVACY_URL], ['Terms', TERMS_URL], ['Contact', 'mailto:privacy@lumniverse.com']]],
