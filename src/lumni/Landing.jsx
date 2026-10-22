@@ -1,11 +1,12 @@
 import { useEffect, useRef, useState } from 'react';
 import { motion } from 'framer-motion';
-import { ArrowRight, Check, Copy, Github } from 'lucide-react';
+import { ArrowRight, Check, Copy, Github, Play } from 'lucide-react';
 import { AgentTimeline, STEPS } from './AgentTimeline';
 import { Art, Shot } from './Art';
 import { Catalog } from './Catalog';
 import { LiveDemo } from './LiveDemo';
 import { Zoom } from './Zoom';
+import { Film, openFilm } from './Film';
 import { SkillCommand, SkillInstall } from './SkillInstall';
 import {
   GITHUB_URL, NPM_URL, PRIVACY_URL, SELF_HOST_URL, SIGNIN_URL, SIGNUP_URL, TERMS_URL, TRY_COMMAND,
@@ -38,6 +39,7 @@ export function Landing() {
       </main>
       <Footer />
       <Zoom />
+      <Film />
     </div>
   );
 }
@@ -138,15 +140,24 @@ function Hero({ onDemo }) {
     <section className="relative pt-24 sm:pt-28 pb-16 sm:pb-24 px-5 sm:px-6 overflow-hidden">
       <div className="max-w-[1320px] mx-auto grid lg:grid-cols-[minmax(340px,430px)_minmax(0,820px)] gap-10 lg:gap-14 items-center justify-between">
         <div>
-          <motion.button
-            type="button"
-            onClick={onDemo}
-            {...intro(0)}
-            className="inline-flex items-center gap-2 rounded-full border border-lm-line bg-white pl-1.5 pr-3.5 py-1.5 text-sm text-lm-ink2 hover:text-lm-ink mb-6"
-          >
-            <span className="rounded-full bg-lm-pop px-2 py-0.5 text-xs font-semibold text-lm-ink">Live</span>
-            Try the live demo <ArrowRight className="w-3 h-3" />
-          </motion.button>
+          <motion.div {...intro(0)} className="flex flex-wrap items-center gap-2 mb-6">
+            <button
+              type="button"
+              onClick={onDemo}
+              className="inline-flex items-center gap-2 rounded-full border border-lm-line bg-white pl-1.5 pr-3.5 py-1.5 text-sm text-lm-ink2 hover:text-lm-ink"
+            >
+              <span className="rounded-full bg-lm-pop px-2 py-0.5 text-xs font-semibold text-lm-ink">Live</span>
+              Try the live demo <ArrowRight className="w-3 h-3" />
+            </button>
+            <a
+              href="#film"
+              onClick={(e) => { e.preventDefault(); openFilm(); }}
+              className="inline-flex items-center gap-2 rounded-full px-3 py-1.5 text-sm text-lm-ink2 hover:text-lm-ink"
+            >
+              <span className="w-5 h-5 rounded-full bg-lm-ink text-white grid place-items-center"><Play className="w-2.5 h-2.5 fill-current ml-px" /></span>
+              Watch the 40s film
+            </a>
+          </motion.div>
           <motion.h1 {...intro(0.05)} className="text-[42px] sm:text-[56px] font-semibold tracking-[-0.045em] leading-[1.02]">
             AI agents that don’t step on each other.
           </motion.h1>
@@ -577,7 +588,7 @@ function End() {
 
 function Footer() {
   const cols = [
-    ['Product', [['The product', '#product'], ['Pricing', '#pricing'], ['Live demo', '#demo'], ['Log in', SIGNIN_URL]]],
+    ['Product', [['The product', '#product'], ['Pricing', '#pricing'], ['Live demo', '#demo'], ['The film', '#film'], ['Log in', SIGNIN_URL]]],
     ['Open source', [['GitHub', GITHUB_URL], ['Self-hosting', SELF_HOST_URL], ['License (FSL)', `${GITHUB_URL}/blob/main/LICENSE`]]],
     ['Developers', [['The Lumni skill', '#skill'], ['llms.txt', '/llms.txt'], ['npm: lumniverse', NPM_URL], ['SDKs', `${GITHUB_URL}/blob/main/docs/sdk.md`]]],
     ['Company', [['Privacy', PRIVACY_URL], ['Terms', TERMS_URL], ['Contact', 'mailto:privacy@lumniverse.com']]],
